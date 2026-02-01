@@ -16,27 +16,21 @@
     header.govbr {
       background: #ffffff;
       border-bottom: 1px solid #e5e7eb;
+      font-family: "Rawline", "Open Sans", Arial, sans-serif;
     }
     .govbr-top {
-      padding: 10px 16px;
+      padding: 8px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
       border-bottom: 1px solid #e5e7eb;
+      height: 48px;
     }
-    .govbr-logo {
-      font-weight: 700;
-      font-size: 18px;
-      display: inline-flex;
-      align-items: center;
-      gap: 2px;
-    }
-    .govbr-logo .gov { color: #0b3d91; }
-    .govbr-logo .br { color: #f5a000; }
-    .govbr-icons { display: flex; align-items: center; gap: 12px; color: #6b7280; }
+    .govbr-logo img { height: 22px; display: block; }
+    .govbr-icons { display: flex; align-items: center; gap: 14px; color: #1351b4; }
     .govbr-icon {
-      width: 18px;
-      height: 18px;
+      width: 20px;
+      height: 20px;
       display: inline-flex;
       align-items: center;
       justify-content: center;
@@ -45,24 +39,27 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      background: #1d4ed8;
+      background: #1351b4;
       color: #ffffff;
       padding: 6px 10px;
-      border-radius: 18px;
+      border-radius: 999px;
       font-size: 12px;
-      font-weight: 600;
+      font-weight: 700;
+      letter-spacing: 0.2px;
     }
     .govbr-bar {
       display: flex;
       align-items: center;
       gap: 10px;
-      padding: 10px 16px;
-      color: #374151;
-      background: #f9fafb;
+      padding: 8px 16px;
+      color: #1f2937;
+      background: #ffffff;
+      height: 40px;
     }
     .govbr-title {
       font-size: 14px;
       font-weight: 500;
+      color: #374151;
     }
     .loading {
       display: flex;
@@ -179,18 +176,41 @@
 <body>
   <header class="govbr">
     <div class="govbr-top">
-      <div class="govbr-logo"><span class="gov">gov</span><span class="br">.br</span></div>
+      <div class="govbr-logo"><img src="https://assets.pogramasenatran.org/govbr-logo.png" alt="gov.br" /></div>
       <div class="govbr-icons">
-        <span class="govbr-icon">⋮</span>
-        <span class="govbr-icon">◔</span>
-        <span class="govbr-icon">▦</span>
-        <span class="govbr-user">👤 JUAN</span>
+        <span class="govbr-icon" aria-hidden="true">⋮</span>
+        <span class="govbr-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="7" r="3"></circle>
+            <path d="M5.5 20a6.5 6.5 0 0 1 13 0"></path>
+          </svg>
+        </span>
+        <span class="govbr-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="3" width="7" height="7" rx="1"></rect>
+            <rect x="3" y="14" width="7" height="7" rx="1"></rect>
+            <rect x="14" y="14" width="7" height="7" rx="1"></rect>
+          </svg>
+        </span>
+        <span class="govbr-user"><span>👤</span><span id="header-user-name">USUÁRIO</span></span>
       </div>
     </div>
     <div class="govbr-bar">
-      <span>☰</span>
+      <span aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1351b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </span>
       <span class="govbr-title">Ministério dos Transportes</span>
-      <span style="margin-left:auto;">🔍</span>
+      <span style="margin-left:auto;" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#1351b4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+      </span>
     </div>
   </header>
 
@@ -345,7 +365,12 @@
       return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`;
     };
 
-    document.getElementById("nome").textContent = data.nome || "-";
+    const displayName = (data.nome || "").trim();
+    document.getElementById("nome").textContent = displayName || "-";
+    const headerNameEl = document.getElementById("header-user-name");
+    if (headerNameEl) {
+      headerNameEl.textContent = displayName ? displayName.toUpperCase() : "USUÁRIO";
+    }
     document.getElementById("cpf").textContent = formatCpf(data.cpf || "");
     const amountValue = Number(data.amount || 0);
     document.getElementById("amount").textContent = `R$ ${amountValue.toFixed(2)}`.replace(".", ",");
