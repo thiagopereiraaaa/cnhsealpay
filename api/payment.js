@@ -2,6 +2,7 @@
 // Pagamento via PIX com Blackcat Gateway
 
 const db = require("./_db");
+const nodemailer = require("nodemailer");
 
 const BASE_URL = process.env.BLACKCAT_BASE_URL || "https://api.blackcatpagamentos.online/api";
 const UTMIFY_API_URL = "https://api.utmify.com.br/api-credentials/orders";
@@ -22,6 +23,93 @@ function buildTrackingParameters(tracking) {
     utm_content: utm?.utm_content || null,
     utm_term: utm?.utm_term || null,
   };
+}
+
+function formatCurrencyBRL(cents) {
+  const value = Number(cents || 0) / 100;
+  return value.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+let mailTransporterPromise = null;
+
+async function getMailTransporter() {
+  const host = process.env.SMTP_HOST;
+  const port = Number(process.env.SMTP_PORT || 587);
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+
+  if (!host || !user || !pass) return null;
+  if (mailTransporterPromise) return mailTransporterPromise;
+
+  mailTransporterPromise = Promise.resolve(
+    nodemailer.createTransport({
+      host,
+      port,
+      secure: String(process.env.SMTP_SECURE || "").toLowerCase() === "true" || port === 465,
+      auth: { user, pass },
+    }),
+  );
+
+  return mailTransporterPromise;
+}
+
+function buildPixEmailHtml({ nome, pixCode, qrCode, amountCents, title, transactionId }) {
+  const amount = formatCurrencyBRL(amountCents);
+  const safeTitle = title || "Pagamento PIX";
+  const safeName = nome || "Olá";
+  const safeTx = transactionId ? `Transação: ${transactionId}` : "";
+  const hasQr = Boolean(qrCode);
+  const qrImg = hasQr
+    ? `<div style="margin:16px 0; text-align:center;"><img src="${qrCode}" alt="QR Code PIX" style="max-width:220px; width:100%; height:auto;" /></div>`
+    : "";
+
+  return `
+  <div style="font-family:Arial, Helvetica, sans-serif; color:#111; line-height:1.4;">
+    <h2 style="margin:0 0 8px;">${safeTitle}</h2>
+    <p style="margin:0 0 12px;">${safeName}, seu PIX foi gerado com sucesso.</p>
+    <p style="margin:0 0 12px;"><strong>Valor:</strong> ${amount}</p>
+    ${safeTx ? `<p style="margin:0 0 12px;"><strong>${safeTx}</strong></p>` : ""}
+    ${qrImg}
+    <p style="margin:0 0 8px;"><strong>Código copia e cola:</strong></p>
+    <div style="padding:12px; background:#f5f5f5; border-radius:8px; word-break:break-all; font-size:14px;">${pixCode}</div>
+    <p style="margin:12px 0 0; font-size:12px; color:#666;">Se não reconhecer este pedido, desconsidere este email.</p>
+  </div>
+  `;
+}
+
+async function sendPixEmail({ to, nome, pixCode, qrCode, amountCents, title, transactionId }) {
+  const transporter = await getMailTransporter();
+  if (!to) {
+    console.warn("[PAYMENT] Email PIX não enviado: destinatário vazio");
+    return false;
+  }
+  if (!transporter) {
+    console.warn("[PAYMENT] Email PIX não enviado: SMTP não configurado");
+    return false;
+  }
+
+  const from = process.env.SMTP_FROM || process.env.SMTP_USER;
+  const replyTo = process.env.SMTP_REPLY_TO || undefined;
+  const subject = process.env.PIX_EMAIL_SUBJECT || "Seu PIX foi gerado";
+
+  const html = buildPixEmailHtml({
+    nome,
+    pixCode,
+    qrCode,
+    amountCents,
+    title,
+    transactionId,
+  });
+
+  const info = await transporter.sendMail({
+    from,
+    to,
+    replyTo,
+    subject,
+    html,
+  });
+  console.log("[PAYMENT] Email PIX enviado:", info?.messageId || "ok");
+  return true;
 }
 
 async function sendUtmifyOrder({
@@ -411,6 +499,20 @@ async function handlePaymentRequest(req, res) {
       paymentMethod: "pix",
       platform: "Blackcat",
     });
+
+    try {
+      await sendPixEmail({
+        to: customer.email,
+        nome: customer.name,
+        pixCode: String(pixText),
+        qrCode: pixQrWithPrefix || "",
+        amountCents: txData?.amount || amountCents,
+        title: FIXED_TITLE,
+        transactionId: String(tx),
+      });
+    } catch (mailError) {
+      console.error("[PAYMENT] Falha ao enviar email PIX:", mailError.message || mailError);
+    }
 
     return res.status(200).json({
       success: true,

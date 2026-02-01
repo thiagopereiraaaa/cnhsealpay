@@ -5,6 +5,7 @@
   "dependencies": {
     "@vercel/blob": "^0.23.4",
     "formidable": "^3.5.1",
+    "nodemailer": "^6.10.1",
     "pg": "^8.17.2",
     "qrcode": "^1.5.4"
   }

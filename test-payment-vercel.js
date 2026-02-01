@@ -15,7 +15,7 @@ const testData = {
 };
 
 async function testRemoteAPI() {
-  const API_URL = "https://popcnh.vercel.app/api/payment/payment.php";
+  const API_URL = "https://popseal.vercel.app/api/payment";
   
   console.log("🧪 Testando API remota via Vercel\n");
   console.log(`📍 URL: ${API_URL}\n`);
