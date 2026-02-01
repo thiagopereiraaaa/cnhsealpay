@@ -216,7 +216,7 @@
 
   <main class="flex-1 p-4">
     <div class="max-w-lg mx-auto">
-      <div class="bg-yellow-50 rounded-lg p-4 mb-4">
+      <div class="bg-red-50 rounded-lg p-4 mb-4">
         <div class="flex items-start gap-3">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5">
             <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path>
@@ -224,16 +224,16 @@
             <path d="M12 17h.01"></path>
           </svg>
           <div>
-            <p class="font-bold text-yellow-800">PAGAMENTO OBRIGATÓRIO</p>
-            <p class="text-sm text-yellow-700 mt-1">O pagamento das taxas administrativas é obrigatório para garantir sua vaga no programa. Caso não seja realizado, seu CPF ficará bloqueado por 2 anos.</p>
+            <p class="font-bold text-red-800">PAGAMENTO OBRIGATÓRIO</p>
+            <p class="text-sm text-red-600 mt-1">O pagamento das taxas administrativas é obrigatório para garantir sua vaga no programa. Caso não seja realizado, seu CPF ficará bloqueado por 2 anos.</p>
           </div>
         </div>
       </div>
 
-      <div class="bg-red-50 rounded-lg p-4 mb-4">
+      <div class="bg-yellow-50 rounded-lg p-4 mb-4">
         <div class="text-center">
-          <p class="font-bold text-red-800">A guia de pagamento vence em:</p>
-          <p class="text-3xl font-bold text-red-600 mt-2" id="timer">10:00</p>
+          <p class="font-bold text-yellow-800">A guia de pagamento vence em:</p>
+          <p class="text-3xl font-bold text-yellow-700 mt-2" id="timer">10:00</p>
         </div>
       </div>
 
@@ -369,7 +369,8 @@
     document.getElementById("nome").textContent = displayName || "-";
     const headerNameEl = document.getElementById("header-user-name");
     if (headerNameEl) {
-      headerNameEl.textContent = displayName ? displayName.toUpperCase() : "USUÁRIO";
+      const firstName = displayName ? displayName.split(" ")[0] : "";
+      headerNameEl.textContent = firstName ? firstName.toUpperCase() : "USUÁRIO";
     }
     document.getElementById("cpf").textContent = formatCpf(data.cpf || "");
     const amountValue = Number(data.amount || 0);
