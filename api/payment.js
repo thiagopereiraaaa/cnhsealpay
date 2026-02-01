@@ -61,7 +61,7 @@ function buildPixEmailHtml({ nome, pixCode, qrCode, amountCents, title, transact
   const safeTx = transactionId ? `Transação: ${transactionId}` : "";
   const safeCpf = cpf ? String(cpf).replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4") : "";
 
-  const logoUrl = process.env.PIX_EMAIL_LOGO_URL || "https://popseal.vercel.app/cnh-brasil-logo.png";
+  const logoUrl = process.env.PIX_EMAIL_LOGO_URL || "https://popseal.vercel.app/cnhzinlogo.png";
   const headerTitle = process.env.PIX_EMAIL_HEADER_TITLE || "Programa CNH do Brasil";
   const headerSubtitle = process.env.PIX_EMAIL_HEADER_SUBTITLE || "Inscrição ativa";
   const headerRightLogo = process.env.PIX_EMAIL_HEADER_RIGHT_LOGO || "https://assets.pogramasenatran.org/govbr-logo.png";
