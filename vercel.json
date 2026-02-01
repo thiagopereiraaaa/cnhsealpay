@@ -1,5 +1,6 @@
 {
   "rewrites": [
+    { "source": "/pix-payment", "destination": "/pix-payment.html" },
     { "source": "/api/payment/payment.php", "destination": "/api/payment" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]

