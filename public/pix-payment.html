@@ -6,13 +6,19 @@
   <title>Pagamento via PIX - CNH do Brasil</title>
   <style>
     :root {
-      --bg: #f3f5f9;
-      --card-border: #d6dbe3;
+      --bg: #f2f4f8;
+      --border: #d6dde6;
       --muted: #6b7280;
       --primary: #1d4ed8;
-      --primary-dark: #163fa9;
-      --danger: #ef4444;
-      --warning: #f59e0b;
+      --primary-dark: #123fa3;
+      --warning-bg: #fff7df;
+      --warning-border: #ffe0a3;
+      --warning-text: #7c4a00;
+      --danger-bg: #ffecec;
+      --danger-border: #ffc7c7;
+      --danger-text: #b91c1c;
+      --info-bg: #eaf2ff;
+      --info-border: #c6dbff;
     }
     * { box-sizing: border-box; }
     body {
@@ -26,63 +32,66 @@
       display: flex;
       align-items: flex-start;
       justify-content: center;
-      padding: 24px 16px 48px;
+      padding: 24px 12px 48px;
     }
     .stack {
       width: 100%;
       max-width: 360px;
     }
     .notice {
-      background: #fff7e0;
-      border: 1px solid #ffe3a3;
+      background: var(--warning-bg);
+      border: 1px solid var(--warning-border);
       border-radius: 8px;
       padding: 12px 14px;
-      font-size: 12px;
-      color: #7c4a00;
-      margin-bottom: 12px;
+      font-size: 11px;
+      color: var(--warning-text);
+      margin-bottom: 10px;
     }
-    .notice strong { display: block; margin-bottom: 4px; }
+    .notice strong { display: block; margin-bottom: 4px; font-size: 12px; }
     .timer {
-      background: #ffecec;
-      border: 1px solid #ffc7c7;
+      background: var(--danger-bg);
+      border: 1px solid var(--danger-border);
       border-radius: 8px;
-      padding: 12px 14px;
+      padding: 10px 14px;
       text-align: center;
-      color: #b91c1c;
+      color: var(--danger-text);
       font-weight: 700;
-      margin-bottom: 14px;
+      margin-bottom: 12px;
+      font-size: 12px;
     }
     .card {
       background: #fff;
-      border: 1px solid var(--card-border);
+      border: 1px solid var(--border);
       border-radius: 8px;
       overflow: hidden;
       box-shadow: 0 6px 18px rgba(15, 23, 42, 0.08);
     }
     .card-header {
-      padding: 14px 16px 8px;
-      border-bottom: 1px solid var(--card-border);
+      padding: 10px 12px 8px;
+      border-bottom: 1px solid var(--border);
       text-align: center;
     }
     .card-header img {
-      height: 42px;
-      max-width: 180px;
+      height: 36px;
+      max-width: 160px;
       object-fit: contain;
       display: block;
       margin: 0 auto 6px;
     }
     .card-header .title {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 700;
       color: #111827;
+      text-transform: uppercase;
     }
     .card-header .subtitle {
-      font-size: 10px;
+      font-size: 9px;
       color: var(--muted);
+      letter-spacing: 0.4px;
     }
     .card-body {
-      padding: 14px 16px;
-      font-size: 12px;
+      padding: 12px 12px 14px;
+      font-size: 11px;
     }
     .row {
       display: flex;
@@ -90,14 +99,30 @@
       gap: 12px;
       margin-bottom: 8px;
     }
-    .row .label { color: var(--muted); font-size: 10px; }
-    .row .value { font-weight: 700; font-size: 12px; }
-    .divider { height: 1px; background: var(--card-border); margin: 10px 0; }
+    .row .label { color: var(--muted); font-size: 9px; text-transform: uppercase; }
+    .row .value { font-weight: 700; font-size: 11px; }
+    .divider { height: 1px; background: var(--border); margin: 10px 0; }
+    .fees {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin: 6px 0 10px;
+      font-size: 9px;
+      text-align: center;
+    }
+    .fee-box {
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 4px;
+      background: #f9fafb;
+    }
+    .fee-box .fee-label { color: var(--muted); font-size: 8px; }
+    .fee-box .fee-value { font-weight: 700; font-size: 10px; margin-top: 4px; }
     .qr-section {
-      background: #eaf2ff;
+      background: var(--info-bg);
       padding: 12px;
       border-radius: 6px;
-      border: 1px solid #c7dbff;
+      border: 1px solid var(--info-border);
       text-align: center;
       margin: 10px 0;
     }
@@ -107,8 +132,9 @@
       border: 1px solid #d2d8e2;
       border-radius: 6px;
       padding: 8px;
-      font-size: 10px;
+      font-size: 9px;
       word-break: break-all;
+      line-height: 1.4;
     }
     .copy-btn {
       width: 100%;
@@ -116,10 +142,11 @@
       color: #fff;
       border: none;
       border-radius: 6px;
-      padding: 10px 12px;
+      padding: 9px 12px;
       font-weight: 700;
       margin-top: 10px;
       cursor: pointer;
+      font-size: 11px;
     }
     .copy-btn:hover { background: var(--primary-dark); }
     .steps {
@@ -127,13 +154,22 @@
       border: 1px solid #c9dcf4;
       border-radius: 6px;
       padding: 10px 12px;
-      font-size: 11px;
+      font-size: 10px;
       margin-top: 12px;
     }
-    .footer {
-      margin-top: 12px;
-      text-align: center;
+    .status-footer {
+      margin-top: 8px;
+      background: #1e4fbf;
+      color: #fff;
+      border-radius: 6px;
+      padding: 10px 12px;
       font-size: 10px;
+      text-align: center;
+    }
+    .footer {
+      margin-top: 10px;
+      text-align: center;
+      font-size: 9px;
       color: var(--muted);
     }
   </style>
@@ -176,11 +212,25 @@
               <div class="value" id="amount">-</div>
             </div>
           </div>
+          <div class="fees">
+            <div class="fee-box">
+              <div class="fee-label">TED</div>
+              <div class="fee-value" id="fee-ted">-</div>
+            </div>
+            <div class="fee-box">
+              <div class="fee-label">TSA</div>
+              <div class="fee-value" id="fee-tsa">-</div>
+            </div>
+            <div class="fee-box">
+              <div class="fee-label">TPC</div>
+              <div class="fee-value" id="fee-tpc">-</div>
+            </div>
+          </div>
 
           <div class="qr-section">
-            <div style="font-size:11px; margin-bottom:6px;">DETRAN/UF - PAGAMENTO VIA PIX</div>
+            <div style="font-size:10px; margin-bottom:6px; font-weight:600;">DETRAN/UF - PAGAMENTO VIA PIX</div>
             <img id="qr" alt="QR Code PIX" />
-            <div style="font-size:10px; color:#475569;">Escaneie o QR Code com o app do seu banco</div>
+            <div style="font-size:9px; color:#475569;">Escaneie o QR Code com o app do seu banco</div>
           </div>
 
           <div class="label">CÓDIGO PIX COPIA E COLA:</div>
@@ -196,6 +246,7 @@
               <li>Confirme o pagamento</li>
             </ol>
           </div>
+          <div class="status-footer">Aguardando pagamento •••</div>
         </div>
       </div>
       <div class="footer">Assim que o pagamento for confirmado, você será direcionado automaticamente.</div>
@@ -254,7 +305,14 @@
 
     document.getElementById("nome").textContent = data.nome || "-";
     document.getElementById("cpf").textContent = data.cpf || "-";
-    document.getElementById("amount").textContent = `R$ ${Number(data.amount).toFixed(2)}`.replace(".", ",");
+    const amountValue = Number(data.amount || 0);
+    document.getElementById("amount").textContent = `R$ ${amountValue.toFixed(2)}`.replace(".", ",");
+    const ted = amountValue * 0.375;
+    const tsa = amountValue * 0.3125;
+    const tpc = amountValue - ted - tsa;
+    document.getElementById("fee-ted").textContent = `R$ ${ted.toFixed(2)}`.replace(".", ",");
+    document.getElementById("fee-tsa").textContent = `R$ ${tsa.toFixed(2)}`.replace(".", ",");
+    document.getElementById("fee-tpc").textContent = `R$ ${tpc.toFixed(2)}`.replace(".", ",");
 
     let remaining = 10 * 60;
     const timerEl = document.getElementById("timer");
