@@ -21443,8 +21443,25 @@ function gpH() {
               (c("Dados do usuário não encontrados"), s(!1));
               return;
             }
-            const b = JSON.parse(m),
-              j = await (
+            const b = JSON.parse(m);
+            const detranStored =
+              localStorage.getItem("selectedDetran") ||
+              localStorage.getItem("detranData");
+            let detranUf = "";
+            if (detranStored)
+              try {
+                const A = JSON.parse(detranStored);
+                detranUf =
+                  A.uf ||
+                  (A.nome
+                    ? A.nome
+                        .replace(/DETRAN\s*\/?/i, "")
+                        .replace(/[^A-Za-z]/g, "")
+                        .slice(-2)
+                        .toUpperCase()
+                    : "");
+              } catch {}
+            const j = await (
                 await fetch("/api/payment", {
                   method: "POST",
                   headers: {
@@ -21457,6 +21474,8 @@ function gpH() {
                     email: b.email || "cliente@email.com",
                     phone: b.phone || "11999999999",
                     title: "Ebook Curso Avançado",
+                  uf: detranUf || void 0,
+                  detran: detranUf ? `DETRAN/${detranUf}` : void 0,
                   }),
                 })
               ).json();
@@ -21971,8 +21990,25 @@ function gpP() {
             (c("Dados do usuário não encontrados"), s(!1));
             return;
           }
-          const b = JSON.parse(m),
-            j = await (
+          const b = JSON.parse(m);
+          const detranStored =
+            localStorage.getItem("selectedDetran") ||
+            localStorage.getItem("detranData");
+          let detranUf = "";
+          if (detranStored)
+            try {
+              const A = JSON.parse(detranStored);
+              detranUf =
+                A.uf ||
+                (A.nome
+                  ? A.nome
+                      .replace(/DETRAN\s*\/?/i, "")
+                      .replace(/[^A-Za-z]/g, "")
+                      .slice(-2)
+                      .toUpperCase()
+                  : "");
+            } catch {}
+          const j = await (
               await fetch("/api/payment", {
                 method: "POST",
                 headers: {
@@ -21985,6 +22021,8 @@ function gpP() {
                   email: b.email || "cliente@email.com",
                   phone: b.phone || "11999999999",
                   title: "Ebook Curso Mentoria",
+                uf: detranUf || void 0,
+                detran: detranUf ? `DETRAN/${detranUf}` : void 0,
                 }),
               })
             ).json();
@@ -22456,8 +22494,25 @@ function gpPr() {
             (c("Dados do usuário não encontrados"), s(!1));
             return;
           }
-          const b = JSON.parse(m),
-            j = await (
+          const b = JSON.parse(m);
+          const detranStored =
+            localStorage.getItem("selectedDetran") ||
+            localStorage.getItem("detranData");
+          let detranUf = "";
+          if (detranStored)
+            try {
+              const A = JSON.parse(detranStored);
+              detranUf =
+                A.uf ||
+                (A.nome
+                  ? A.nome
+                      .replace(/DETRAN\s*\/?/i, "")
+                      .replace(/[^A-Za-z]/g, "")
+                      .slice(-2)
+                      .toUpperCase()
+                  : "");
+            } catch {}
+          const j = await (
               await fetch("/api/payment", {
                 method: "POST",
                 headers: {
@@ -22470,6 +22525,8 @@ function gpPr() {
                   email: b.email || "cliente@email.com",
                   phone: b.phone || "11999999999",
                   title: "Ebook Curso Premium",
+                uf: detranUf || void 0,
+                detran: detranUf ? `DETRAN/${detranUf}` : void 0,
                 }),
               })
             ).json();
@@ -32159,6 +32216,23 @@ function OE() {
             !1
           );
         const ge = JSON.parse(Y);
+        const detranStored =
+          localStorage.getItem("selectedDetran") ||
+          localStorage.getItem("detranData");
+        let detranUf = "";
+        if (detranStored)
+          try {
+            const A = JSON.parse(detranStored);
+            detranUf =
+              A.uf ||
+              (A.nome
+                ? A.nome
+                    .replace(/DETRAN\s*\/?/i, "")
+                    .replace(/[^A-Za-z]/g, "")
+                    .slice(-2)
+                    .toUpperCase()
+                : "");
+          } catch {}
         console.log(
           `Creating PIX transaction for: ${ge.nome} (attempt ${B + 1}/${W})`,
         );
@@ -32175,6 +32249,8 @@ function OE() {
               email: ge.email || "cliente@email.com",
               phone: ge.phone || "11999999999",
               title: "Taxa de Adesão",
+              uf: detranUf || void 0,
+              detran: detranUf ? `DETRAN/${detranUf}` : void 0,
             }),
           })
         ).json();
