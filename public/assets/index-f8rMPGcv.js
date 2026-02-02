@@ -31885,7 +31885,6 @@ function OE() {
     Z = f != null && f.nome ? _i(f.nome.split(" ")[0]) : "Cidadão",
     Te = () =>
       [
-        "JANEIRO",
         "FEVEREIRO",
         "MARÇO",
         "ABRIL",
