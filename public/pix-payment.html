@@ -225,7 +225,7 @@
 
   <main class="flex-1 p-4">
     <div class="max-w-lg mx-auto">
-      <div class="bg-red-50 rounded-lg p-4 mb-4">
+      <div class="bg-red-50 rounded-lg p-3 mb-3">
         <div class="flex items-start gap-3">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-6 h-6 text-yellow-600 flex-shrink-0 mt-0.5">
             <path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path>
@@ -239,7 +239,7 @@
         </div>
       </div>
 
-      <div class="bg-yellow-50 rounded-lg p-4 mb-4">
+      <div class="bg-yellow-50 rounded-lg p-3 mb-3">
         <div class="text-center">
           <p class="font-bold text-yellow-800">A guia de pagamento vence em:</p>
           <p class="text-3xl font-bold text-yellow-700 mt-2" id="timer">10:00</p>
@@ -247,7 +247,7 @@
       </div>
 
       <div class="bg-white border-2 border-gray-300 shadow-lg" style="font-family: Arial, sans-serif;">
-        <div class="bg-white p-4 border-b border-gray-300">
+        <div class="bg-white p-3 border-b border-gray-300">
           <div class="flex flex-col items-center">
             <img id="detran-logo" alt="Brasão do Estado" class="h-16 max-w-[200px] object-contain mb-2" />
             <p class="text-sm font-bold text-gray-800" id="detran-title">DETRAN/UF - GUIA DE RECOLHIMENTO</p>
@@ -255,7 +255,7 @@
           </div>
         </div>
 
-        <div class="p-4 border-b border-gray-300">
+        <div class="p-3 border-b border-gray-300">
           <div>
             <p class="text-gray-500 text-xs">CONTRIBUINTE</p>
             <p class="font-bold text-gray-800" id="nome">-</p>
@@ -266,14 +266,14 @@
           </div>
         </div>
 
-        <div class="p-4 border-b border-gray-300 bg-gray-50">
+        <div class="p-3 border-b border-gray-300 bg-gray-50">
           <div class="text-center">
             <p class="text-gray-500 text-xs">EXERCÍCIO</p>
             <p class="font-bold text-gray-800 text-lg" id="exercise">2026</p>
           </div>
         </div>
 
-        <div class="p-4 border-b border-gray-300">
+        <div class="p-3 border-b border-gray-300">
           <div class="grid grid-cols-3 gap-2 text-sm">
             <div>
               <p class="text-gray-500 text-xs">TED</p>
@@ -290,28 +290,28 @@
           </div>
         </div>
 
-        <div class="p-4 bg-[#E8F0FE]">
-          <div class="text-center mb-3">
+        <div class="p-3 bg-[#E8F0FE]">
+          <div class="text-center mb-2">
             <p class="font-bold text-sm text-[#1351B4]" id="pix-title">DETRAN/UF - PAGAMENTO VIA PIX</p>
             <p class="text-xs text-gray-600">Programa CNH do Brasil - Taxas Administrativas</p>
           </div>
-          <div class="bg-white p-3 rounded border border-gray-300 mb-3 flex flex-col items-center">
+          <div class="bg-white p-3 rounded border border-gray-300 mb-2 flex flex-col items-center">
             <p class="text-xs text-gray-500 mb-2">QR CODE PIX:</p>
             <div id="qr-loading" class="loading">Carregando QR Code...</div>
             <img id="qr" alt="QR Code PIX" class="w-56 h-56 object-contain" style="display:none;" />
           </div>
-          <div class="bg-white p-3 rounded border border-gray-300 mb-3">
+          <div class="bg-white p-3 rounded border border-gray-300 mb-2">
             <p class="text-xs text-gray-500 mb-1">CÓDIGO PIX COPIA E COLA:</p>
             <p id="pix-code" class="text-xs break-all font-mono bg-gray-50 p-2 rounded border">-</p>
           </div>
-          <button id="copy" class="w-full flex items-center justify-center gap-2 p-4 bg-[#1351B4] text-white rounded-md shadow-md hover:bg-[#0D3A8C] transition-all font-medium">
+          <button id="copy" class="w-full flex items-center justify-center gap-2 p-3 bg-[#1351B4] text-white rounded-md shadow-md hover:bg-[#0D3A8C] transition-all font-medium">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
               <rect width="14" height="14" x="8" y="8" rx="2" ry="2"></rect>
               <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path>
             </svg>
             <span>Copiar Código PIX</span>
           </button>
-          <div class="mt-3 summary-row">
+          <div class="mt-2 summary-row">
             <div class="summary-col">
               <span class="summary-label">VENCIMENTO DA GUIA</span>
               <span class="summary-value" id="due-date">-</span>
@@ -324,7 +324,7 @@
         </div>
       </div>
 
-      <div class="mt-4 bg-[#2670CC] text-white p-4 rounded-lg">
+      <div class="mt-3 bg-[#2670CC] text-white p-3 rounded-lg">
         <div class="flex items-center gap-3 mb-2">
           <span>Aguardando pagamento</span>
           <div class="flex items-center gap-1">
