@@ -99,7 +99,10 @@ function buildPixEmailHtml({
   const safeCpf = cpf ? String(cpf).replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4") : "";
   const detranLabel = detran || process.env.PIX_EMAIL_DETRAN_LABEL || "DETRAN/AC";
   const expiresText = process.env.PIX_EMAIL_EXPIRES_TEXT || "Expira em 24 horas";
-  const headerBadge = detranBadgeUrl || "";
+  const headerBadge =
+    detranBadgeUrl ||
+    process.env.PIX_EMAIL_BADGE_FALLBACK ||
+    "https://popseal.vercel.app/cnhzinlogo.png";
 
   return `<!DOCTYPE html>
 <html lang="pt-BR">
