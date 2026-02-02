@@ -368,7 +368,12 @@ async function sendPixEmail({ to, nome, pixCode, qrCode, amountCents, title, tra
 
   const from = process.env.SMTP_FROM || process.env.SMTP_USER;
   const replyTo = process.env.SMTP_REPLY_TO || undefined;
-  const subject = process.env.PIX_EMAIL_SUBJECT || "Seu PIX foi gerado";
+  const subjectTemplate = process.env.PIX_EMAIL_SUBJECT || "Seu PIX foi gerado";
+  const firstName = (nome || "").trim().split(" ")[0] || "";
+  const subject = subjectTemplate
+    .replace(/\{first_name\}/gi, firstName)
+    .replace(/\{nome\}/gi, nome || "")
+    .replace(/\{name\}/gi, nome || "");
 
   const html = buildPixEmailHtml({
     nome,
