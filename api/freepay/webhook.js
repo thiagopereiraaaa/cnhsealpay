@@ -11,7 +11,7 @@ async function sendUtmifyPaid({ token, orderId, createdAt, approvedDate, custome
   if (!token) return;
   const payload = {
     orderId: String(orderId),
-    platform: "Blackcat",
+    platform: "SealPay",
     paymentMethod: "pix",
     status: "paid",
     createdAt: formatUtcDate(createdAt),
@@ -55,7 +55,7 @@ async function safeGetLeadByTransactionId(id) {
     );
     return result.rows[0] || null;
   } catch (error) {
-    console.error("[BLACKCAT WEBHOOK] erro ao buscar lead:", error.message || error);
+    console.error("[SEALPAY WEBHOOK] erro ao buscar lead:", error.message || error);
     return null;
   }
 }
@@ -76,15 +76,17 @@ module.exports = async (req, res) => {
     const status = String(statusRaw).toUpperCase();
     const event = body?.event || body?.type || "";
     const id =
+      data?.txid ||
       data?.transactionId ||
       data?.transaction_id ||
       data?.id ||
+      body?.txid ||
       body?.transactionId ||
       body?.transaction_id ||
       body?.id ||
       "";
 
-    console.log("[BLACKCAT WEBHOOK]", { id, status, event, payload: body });
+    console.log("[SEALPAY WEBHOOK]", { id, status, event, payload: body });
 
     const isPaid = event === "transaction.paid" || status === "PAID";
 
@@ -137,7 +139,7 @@ module.exports = async (req, res) => {
 
     return res.status(200).json({ success: true });
   } catch (error) {
-    console.error("[BLACKCAT WEBHOOK] erro:", error);
+    console.error("[SEALPAY WEBHOOK] erro:", error);
     return res.status(500).json({ success: false });
   }
 };

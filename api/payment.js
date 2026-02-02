@@ -1,11 +1,11 @@
-// Blackcat API Integration
-// Pagamento via PIX com Blackcat Gateway
+// SealPay API Integration
+// Pagamento via PIX com SealPay Gateway
 
 const db = require("./_db");
 const nodemailer = require("nodemailer");
 const QRCode = require("qrcode");
 
-const BASE_URL = process.env.BLACKCAT_BASE_URL || "https://api.blackcatpagamentos.online/api";
+const SEALPAY_BASE_URL = process.env.SEALPAY_BASE_URL || "https://abacate-5eo1.onrender.com";
 const UTMIFY_API_URL = "https://api.utmify.com.br/api-credentials/orders";
 
 const DETRAN_BADGE_BY_UF = {
@@ -413,7 +413,7 @@ async function sendUtmifyOrder({
   gatewayFeeInCents = 0,
   userCommissionInCents,
   paymentMethod = "pix",
-  platform = "Blackcat",
+  platform = "SealPay",
 }) {
   if (!token) return;
   const payload = {
@@ -518,20 +518,12 @@ async function handlePaymentRequest(req, res) {
   }
 
   try {
-    const BLACKCAT_API_KEY = process.env.BLACKCAT_API_KEY;
-    const BLACKCAT_POSTBACK_URL = process.env.BLACKCAT_POSTBACK_URL;
+    const SEALPAY_API_KEY = process.env.SEALPAY_API_KEY;
 
-    if (!BLACKCAT_API_KEY) {
+    if (!SEALPAY_API_KEY) {
       return res.status(500).json({
         success: false,
-        message: "Credenciais da Blackcat não configuradas",
-      });
-    }
-
-    if (!BLACKCAT_POSTBACK_URL) {
-      return res.status(500).json({
-        success: false,
-        message: "BLACKCAT_POSTBACK_URL não configurada",
+        message: "Credenciais da SealPay não configuradas",
       });
     }
 
@@ -640,43 +632,20 @@ async function handlePaymentRequest(req, res) {
       return { utm, src };
     })();
 
-    const documentType = customer.taxId && customer.taxId.length > 11 ? "cnpj" : "cpf";
     const payload = {
       amount: amountCents,
-      currency: "BRL",
-      paymentMethod: "pix",
-      items: [
-        {
-          title: FIXED_TITLE,
-          unitPrice: amountCents,
-          quantity: 1,
-          tangible: false,
-        },
-      ],
+      description: FIXED_TITLE,
       customer: {
         name: customer.name,
         email: customer.email,
-        phone: customer.cellphone,
-        document: {
-          type: documentType,
-          number: customer.taxId,
-        },
+        cellphone: customer.cellphone,
+        taxId: customer.taxId,
       },
-      pix: {
-        expiresInDays: 1,
-      },
-      postbackUrl: BLACKCAT_POSTBACK_URL,
-      externalRef: "taxa_adesao",
-      metadata: JSON.stringify({
-        source: "popseal",
-        cpf: customer.taxId,
-        email: customer.email,
-      }),
-      utm_source: tracking?.utm?.utm_source || tracking?.utm?.source || tracking?.src || undefined,
-      utm_medium: tracking?.utm?.utm_medium || undefined,
-      utm_campaign: tracking?.utm?.utm_campaign || undefined,
-      utm_content: tracking?.utm?.utm_content || undefined,
-      utm_term: tracking?.utm?.utm_term || undefined,
+      tracking,
+      api_key: SEALPAY_API_KEY,
+      fbp: bodyData.fbp || "",
+      fbc: bodyData.fbc || "",
+      user_agent: bodyData.user_agent || req.headers["user-agent"] || "",
     };
 
     const userAgent = bodyData.user_agent || req.headers["user-agent"] || "";
@@ -695,14 +664,13 @@ async function handlePaymentRequest(req, res) {
       ip: req.headers["x-forwarded-for"] || req.socket?.remoteAddress || "",
     });
 
-    console.log("[PAYMENT] Enviando para Blackcat...");
+    console.log("[PAYMENT] Enviando para SealPay...");
 
-    const resp = await fetch(`${BASE_URL}/sales/create-sale`, {
+    const resp = await fetch(`${SEALPAY_BASE_URL}/create-pix`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-API-Key": BLACKCAT_API_KEY,
       },
       body: JSON.stringify(payload),
     });
@@ -710,7 +678,7 @@ async function handlePaymentRequest(req, res) {
     const data = await resp.json().catch(() => ({}));
 
     if (!resp.ok) {
-      console.error("[PAYMENT] Erro Blackcat:", resp.status, data);
+      console.error("[PAYMENT] Erro SealPay:", resp.status, data);
       return res.status(502).json({
         success: false,
         message: data?.error || "Falha ao criar PIX",
@@ -718,22 +686,10 @@ async function handlePaymentRequest(req, res) {
       });
     }
 
-    const txData = Array.isArray(data?.data) ? data.data[0] : data?.data || data;
-    const tx = txData?.transactionId || txData?.id || txData?.transaction_id || txData?.txid;
-    const paymentData = txData?.paymentData || {};
-    const pixText =
-      paymentData?.copyPaste ||
-      paymentData?.qrCode ||
-      txData?.pix_code ||
-      txData?.qr_code ||
-      "";
-    const pixQr =
-      paymentData?.qrCodeBase64 ||
-      paymentData?.qrCode ||
-      txData?.pix_qr_code ||
-      txData?.qr_code_image ||
-      txData?.qr_code ||
-      "";
+    const txData = data || {};
+    const tx = txData?.txid || txData?.id || "";
+    const pixText = txData?.pix_code || "";
+    const pixQr = txData?.pix_qr_code || txData?.qr_code || "";
     const looksLikeBase64 = (value) =>
       typeof value === "string" &&
       value.length > 100 &&
@@ -816,7 +772,7 @@ async function handlePaymentRequest(req, res) {
       gatewayFeeInCents: 0,
       userCommissionInCents: amountCents,
       paymentMethod: "pix",
-      platform: "Blackcat",
+      platform: "SealPay",
     });
 
     let emailQrCode = pixQrWithPrefix || "";

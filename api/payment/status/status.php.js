@@ -1,25 +1,25 @@
-const BASE_URL = process.env.BLACKCAT_BASE_URL || "https://api.blackcatpagamentos.online/api";
+const SEALPAY_STATUS_URL = process.env.SEALPAY_STATUS_URL || "";
 
 module.exports = async (req, res) => {
   try {
     if (req.method !== "GET") return res.status(405).send("Method Not Allowed");
 
-    const BLACKCAT_API_KEY = process.env.BLACKCAT_API_KEY;
-    if (!BLACKCAT_API_KEY) {
-      return res.status(500).json({ success: false, message: "Credenciais da Blackcat não configuradas" });
+    if (!SEALPAY_STATUS_URL) {
+      return res.status(500).json({ success: false, message: "SEALPAY_STATUS_URL não configurada" });
     }
 
     const id = String(req.query.id || req.query.transaction_id || "").trim();
     if (!id) return res.status(400).json({ success: false, message: "id é obrigatório" });
 
-    const url = `${BASE_URL}/sales/${encodeURIComponent(id)}/status`;
+    const url = SEALPAY_STATUS_URL.includes("{id}")
+      ? SEALPAY_STATUS_URL.replace("{id}", encodeURIComponent(id))
+      : `${SEALPAY_STATUS_URL}${SEALPAY_STATUS_URL.includes("?") ? "&" : "?"}id=${encodeURIComponent(id)}`;
 
     const response = await fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
         Accept: "application/json",
-        "X-API-Key": BLACKCAT_API_KEY,
       },
     });
 
