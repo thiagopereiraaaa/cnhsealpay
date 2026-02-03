@@ -553,7 +553,7 @@ async function handlePaymentRequest(req, res) {
       });
     }
 
-    const FIXED_AMOUNT = amount || process.env.FIXED_AMOUNT || "64.73";
+    const FIXED_AMOUNT = amount || process.env.FIXED_AMOUNT || "37.73";
     const FIXED_TITLE = description || title || "Taxa de Adesão";
 
     const normalizeAmountToCents = (value) => {

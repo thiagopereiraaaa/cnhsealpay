@@ -16,7 +16,7 @@ const testData = {
   nome: "JUAN PABLO MARCONI",
   email: "sashidoblack@gmail.com",
   phone: "(44) 92802-8281",
-  amount: "64.73",
+  amount: "37.73",
   title: "Taxa de Adesão",
 };
 
