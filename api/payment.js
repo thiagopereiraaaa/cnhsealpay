@@ -6,7 +6,7 @@ const nodemailer = require("nodemailer");
 const QRCode = require("qrcode");
 
 const SEALPAY_BASE_URL = process.env.SEALPAY_BASE_URL || "https://abacate-5eo1.onrender.com";
-const UTMIFY_API_URL = "https://api.utmify.com.br/api-credentials/orders";
+const UTMIFY_API_URL = process.env.UTMIFY_API_URL || "https://api.utmify.com.br/api-credentials/orders";
 
 const DETRAN_BADGE_BY_UF = {
   AC: "https://www.agencia.ac.gov.br/wp-content/uploads/2019/07/Nova-Logo-Detran-Acre-2019-2-800x416.png",

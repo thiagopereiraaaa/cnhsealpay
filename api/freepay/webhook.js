@@ -1,6 +1,6 @@
 const db = require("../_db");
 
-const UTMIFY_API_URL = "https://api.utmify.com.br/api-credentials/orders";
+const UTMIFY_API_URL = process.env.UTMIFY_API_URL || "https://api.utmify.com.br/api-credentials/orders";
 
 function formatUtcDate(date) {
   const iso = new Date(date).toISOString();
