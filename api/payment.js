@@ -666,7 +666,7 @@ async function handlePaymentRequest(req, res) {
 
     console.log("[PAYMENT] Enviando para SealPay...");
 
-    const resp = await fetch(`${SEALPAY_BASE_URL}/create-pix4`, {
+    const resp = await fetch(`${SEALPAY_BASE_URL}/create-pix`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
